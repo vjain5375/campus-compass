@@ -1556,7 +1556,7 @@ def main():
                     key="main_uploader"
                 )
                 
-                # Upload section with content centered in dotted area
+                # Upload section - center the dotted box on page
                 st.markdown(f"""
                 <div style="text-align: center; margin-bottom: 2rem;">
                     <h2 style="color: {main_upload_text}; margin: 0 0 0.5rem 0; font-size: 2.5rem; font-weight: 800;">🚀 Get Started!</h2>
@@ -1564,15 +1564,17 @@ def main():
                         Upload your college documents to start asking questions
                     </p>
                 </div>
-                <div id="upload-wrapper-main" style="position: relative; margin: 2rem auto; max-width: 800px;">
-                    <div id="upload-container-main" class="upload-button" style="position: relative; background: {main_upload_bg}; padding: 4rem 3rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1; transition: all 0.3s ease;">
-                        <div style="font-size: 4rem; margin-bottom: 1.5rem;">☁️</div>
-                        <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.3rem;">
-                            Drag and drop files here or click to browse
-                        </p>
-                        <p style="margin: 1rem 0 0 0; color: {main_upload_info_text}; font-size: 1rem;">
-                            Limit 200MB per file • PDF, DOCX, DOC, TXT
-                        </p>
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                    <div id="upload-wrapper-main" style="position: relative; max-width: 800px; width: 100%;">
+                        <div id="upload-container-main" class="upload-button" style="position: relative; background: {main_upload_bg}; padding: 4rem 3rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1; transition: all 0.3s ease;">
+                            <div style="font-size: 4rem; margin-bottom: 1.5rem;">☁️</div>
+                            <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.3rem;">
+                                Drag and drop files here or click to browse
+                            </p>
+                            <p style="margin: 1rem 0 0 0; color: {main_upload_info_text}; font-size: 1rem;">
+                                Limit 200MB per file • PDF, DOCX, DOC, TXT
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <script>
