@@ -299,6 +299,18 @@ def get_theme_css(dark_mode):
                 background: #667eea;
                 border-radius: 5px;
             }
+            
+            /* Hide browse button below file uploader */
+            [data-testid="stFileUploader"] button {
+                display: none !important;
+            }
+            [data-testid="stFileUploader"] > div > div > button {
+                display: none !important;
+            }
+            /* Hide the secondary upload area */
+            [data-testid="stFileUploader"] > div > div:last-child {
+                display: none !important;
+            }
         </style>
         """
     else:
@@ -508,6 +520,18 @@ def get_theme_css(dark_mode):
             }
             ::-webkit-scrollbar-thumb:hover {
                 background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            }
+            
+            /* Hide browse button below file uploader */
+            [data-testid="stFileUploader"] button {
+                display: none !important;
+            }
+            [data-testid="stFileUploader"] > div > div > button {
+                display: none !important;
+            }
+            /* Hide the secondary upload area */
+            [data-testid="stFileUploader"] > div > div:last-child {
+                display: none !important;
             }
             
             /* Hide branding but keep sidebar toggle visible */
