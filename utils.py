@@ -16,19 +16,18 @@ def ensure_documents_directory() -> Path:
 
 
 def get_document_files() -> List[str]:
-    """Get list of all document files in documents directory"""
+    """Get list of all document files in documents directory (root only, no subdirectories)"""
     docs_dir = ensure_documents_directory()
     supported_extensions = ['.pdf', '.docx', '.doc', '.txt']
     
-    # Use rglob to recursively find all files, then filter by extension
-    # This avoids duplicates that would occur with both *{ext} and **/*{ext}
-    all_files = list(docs_dir.rglob('*'))
+    # Only look in root directory, not subdirectories (since we only allow single file uploads)
     files = []
     seen_paths = set()  # Track seen files to avoid duplicates
     
-    for file_path in all_files:
+    # Get all files in root directory only
+    for file_path in docs_dir.iterdir():
         if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
-            # Normalize path to avoid duplicates (e.g., Windows path issues)
+            # Use absolute resolved path for deduplication
             normalized_path = str(file_path.resolve())
             if normalized_path not in seen_paths:
                 seen_paths.add(normalized_path)

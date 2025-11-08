@@ -270,13 +270,17 @@ def main():
                             with open(file_path, "wb") as f:
                                 f.write(uploaded_file.getbuffer())
                             
-                            # Verify only one file exists now
+                            # Verify only one file exists now - use absolute path comparison
                             remaining_docs = get_document_files()
+                            file_path_resolved = str(file_path.resolve())
+                            
                             if len(remaining_docs) != 1:
                                 # Force delete all except the one we just saved
                                 for doc_path_str in remaining_docs:
                                     doc_path_obj = Path(doc_path_str)
-                                    if doc_path_obj != file_path and doc_path_obj.exists():
+                                    doc_path_resolved = str(doc_path_obj.resolve())
+                                    # Compare resolved absolute paths
+                                    if doc_path_resolved != file_path_resolved and doc_path_obj.exists():
                                         try:
                                             doc_path_obj.unlink()
                                         except Exception:
