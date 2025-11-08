@@ -633,9 +633,80 @@ def get_theme_css(dark_mode):
                 display: none !important;
                 visibility: hidden !important;
             }
-            /* Make upload containers position relative */
+            /* Make upload wrappers and containers position relative */
+            #upload-wrapper-sidebar, #upload-wrapper-main,
             #upload-container-sidebar, #upload-container-main {
                 position: relative !important;
+                overflow: visible !important;
+            }
+            
+            /* Make file uploader inside wrapper completely transparent and overlay */
+            #upload-wrapper-sidebar [data-testid="stFileUploader"],
+            #upload-wrapper-main [data-testid="stFileUploader"] {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                z-index: 10 !important;
+            }
+            
+            /* Make the drag and drop area transparent and fill the container */
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] > div,
+            #upload-wrapper-main [data-testid="stFileUploader"] > div {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+            }
+            
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] > div > div:first-child,
+            #upload-wrapper-main [data-testid="stFileUploader"] > div > div:first-child {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+                cursor: pointer !important;
+                min-height: 100% !important;
+            }
+            
+            /* Hide all text, icons, and native UI from file uploader */
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] > div > div:first-child > *,
+            #upload-wrapper-main [data-testid="stFileUploader"] > div > div:first-child > * {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            /* Hide the entire secondary upload area (the gray box with cloud icon) */
+            [data-testid="stFileUploader"] > div > div:last-child {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+            }
+            
+            /* Hide all buttons */
+            [data-testid="stFileUploader"] button,
+            [data-testid="stFileUploader"] > div > div > button,
+            [data-testid="stFileUploader"] button[type="button"] {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             
             /* Hide branding but keep sidebar toggle visible */
@@ -882,16 +953,36 @@ def main():
         upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
         upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
         
-        # Create container for the dotted upload area
+        # Create wrapper container for upload area
         st.markdown(f"""
-        <div id="upload-container-sidebar" style="position: relative; background: {upload_bg}; padding: 2rem; border-radius: 15px; border: 3px dashed #667eea; margin: 1rem 0; text-align: center; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
-            <p style="margin: 0; color: {upload_text}; font-weight: 600; font-size: 1.1rem;">
-                📎 Drag and drop files here or click to browse
-            </p>
-            <p style="margin: 0.5rem 0 0 0; color: {upload_info_text}; font-size: 0.9rem;">
-                Limit 200MB per file • PDF, DOCX, DOC, TXT
-            </p>
+        <div id="upload-wrapper-sidebar" style="position: relative; margin: 1rem 0;">
+            <div id="upload-container-sidebar" style="position: relative; background: {upload_bg}; padding: 2rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1;">
+                <p style="margin: 0; color: {upload_text}; font-weight: 600; font-size: 1.1rem;">
+                    📎 Drag and drop files here or click to browse
+                </p>
+                <p style="margin: 0.5rem 0 0 0; color: {upload_info_text}; font-size: 0.9rem;">
+                    Limit 200MB per file • PDF, DOCX, DOC, TXT
+                </p>
+            </div>
         </div>
+        <script>
+            // Move file uploader into the container after it loads
+            setTimeout(function() {{
+                const wrapper = document.getElementById('upload-wrapper-sidebar');
+                const uploader = wrapper?.nextElementSibling?.querySelector('[data-testid="stFileUploader"]');
+                if (uploader && wrapper) {{
+                    uploader.style.position = 'absolute';
+                    uploader.style.top = '0';
+                    uploader.style.left = '0';
+                    uploader.style.right = '0';
+                    uploader.style.bottom = '0';
+                    uploader.style.width = '100%';
+                    uploader.style.height = '100%';
+                    uploader.style.zIndex = '10';
+                    wrapper.appendChild(uploader);
+                }}
+            }}, 100);
+        </script>
         """, unsafe_allow_html=True)
         
         # File uploader positioned to overlay the dotted section
@@ -1164,16 +1255,36 @@ def main():
                 main_upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
                 main_upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
                 
-                # Create container for the dotted upload area
+                # Create wrapper container for upload area
                 st.markdown(f"""
-                <div id="upload-container-main" style="position: relative; background: {main_upload_bg}; padding: 2.5rem; border-radius: 15px; border: 3px dashed #667eea; margin: 1rem 0; text-align: center; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
-                    <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.2rem;">
-                        📎 Drag and drop files here or click to browse
-                    </p>
-                    <p style="margin: 0.5rem 0 0 0; color: {main_upload_info_text}; font-size: 0.9rem;">
-                        Limit 200MB per file • PDF, DOCX, DOC, TXT
-                    </p>
+                <div id="upload-wrapper-main" style="position: relative; margin: 1rem 0;">
+                    <div id="upload-container-main" style="position: relative; background: {main_upload_bg}; padding: 2.5rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1;">
+                        <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.2rem;">
+                            📎 Drag and drop files here or click to browse
+                        </p>
+                        <p style="margin: 0.5rem 0 0 0; color: {main_upload_info_text}; font-size: 0.9rem;">
+                            Limit 200MB per file • PDF, DOCX, DOC, TXT
+                        </p>
+                    </div>
                 </div>
+                <script>
+                    // Move file uploader into the container after it loads
+                    setTimeout(function() {{
+                        const wrapper = document.getElementById('upload-wrapper-main');
+                        const uploader = wrapper?.nextElementSibling?.querySelector('[data-testid="stFileUploader"]');
+                        if (uploader && wrapper) {{
+                            uploader.style.position = 'absolute';
+                            uploader.style.top = '0';
+                            uploader.style.left = '0';
+                            uploader.style.right = '0';
+                            uploader.style.bottom = '0';
+                            uploader.style.width = '100%';
+                            uploader.style.height = '100%';
+                            uploader.style.zIndex = '10';
+                            wrapper.appendChild(uploader);
+                        }}
+                    }}, 100);
+                </script>
                 """, unsafe_allow_html=True)
                 
                 # File uploader positioned to overlay the dotted section
