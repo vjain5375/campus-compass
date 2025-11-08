@@ -81,8 +81,165 @@ st.set_page_config(
     page_title="Campus Compass",
     page_icon="🧭",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': "Campus Compass - AI-powered college Q&A system"
+    }
 )
+
+# Custom CSS for attractive UI
+st.markdown("""
+<style>
+    /* Main styling */
+    .main {
+        padding-top: 2rem;
+    }
+    
+    /* Header styling */
+    .header-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        text-align: center;
+    }
+    
+    .header-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .header-subtitle {
+        font-size: 1.5rem;
+        color: rgba(255,255,255,0.95);
+        margin-top: 0.5rem;
+        font-weight: 300;
+    }
+    
+    .header-description {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.9);
+        margin-top: 1rem;
+    }
+    
+    /* Feature cards */
+    .feature-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 1rem 0;
+        border-left: 4px solid #667eea;
+        transition: transform 0.2s;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Button styling */
+    .stButton>button {
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Input styling */
+    .stTextInput>div>div>input {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem;
+    }
+    
+    .stTextInput>div>div>input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Metric cards */
+    .metric-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    /* Answer container */
+    .answer-container {
+        background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin: 1.5rem 0;
+        border-left: 5px solid #667eea;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    /* Badge styling */
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 0.25rem;
+    }
+    
+    .badge-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .badge-success {
+        background: #10b981;
+        color: white;
+    }
+    
+    .badge-warning {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    
+    /* Chat message styling */
+    .chat-question {
+        background: #667eea;
+        color: white;
+        padding: 1rem;
+        border-radius: 15px 15px 5px 15px;
+        margin: 1rem 0;
+        font-weight: 500;
+    }
+    
+    .chat-answer {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 5px 15px 15px 15px;
+        margin: 1rem 0;
+        border-left: 4px solid #667eea;
+    }
+    
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
 # Load API key after Streamlit is initialized (so secrets are available)
 load_api_key()
@@ -223,10 +380,47 @@ def main():
         clear_all_data()
         st.session_state.session_initialized = True
     
-    # Header
-    st.title("🧭 Campus Compass")
-    st.markdown("### The AI Oracle for Your College")
-    st.markdown("Ask any question about college policies, rules, and information. Get accurate answers with source citations.")
+    # Attractive Header with Gradient
+    st.markdown("""
+    <div class="header-container">
+        <h1 class="header-title">🧭 Campus Compass</h1>
+        <p class="header-subtitle">The AI Oracle for Your College</p>
+        <p class="header-description">✨ Ask anything about college policies, rules, and information. Get instant, accurate answers with source citations.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Feature highlights
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown("""
+        <div class="feature-card">
+            <h3 style="color: #667eea; margin: 0;">⚡ Instant Answers</h3>
+            <p style="margin: 0.5rem 0 0 0; color: #666;">Get answers in seconds</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+        <div class="feature-card">
+            <h3 style="color: #667eea; margin: 0;">📚 Multi-Document</h3>
+            <p style="margin: 0.5rem 0 0 0; color: #666;">Synthesize from all sources</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("""
+        <div class="feature-card">
+            <h3 style="color: #667eea; margin: 0;">🔔 Smart Alerts</h3>
+            <p style="margin: 0.5rem 0 0 0; color: #666;">Never miss deadlines</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col4:
+        st.markdown("""
+        <div class="feature-card">
+            <h3 style="color: #667eea; margin: 0;">🎯 Accurate</h3>
+            <p style="margin: 0.5rem 0 0 0; color: #666;">Cited sources included</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
@@ -236,16 +430,28 @@ def main():
             st.error("⚠️ API key not found! Please configure your API key in the .env file.")
             st.stop()
         
-        # Document processing section
-        st.subheader("📚 Document Management")
+        # Document processing section with attractive header
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+            <h2 style="color: white; margin: 0; text-align: center;">📚 Document Management</h2>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # File uploader for new documents
+        # File uploader for new documents with attractive styling
         st.markdown("### 📤 Upload Documents")
+        st.markdown("""
+        <div style="background: #f0f4ff; padding: 1rem; border-radius: 10px; border: 2px dashed #667eea; margin: 1rem 0;">
+            <p style="margin: 0; color: #667eea; text-align: center; font-weight: 500;">
+                📎 Drag and drop files here or click to browse
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         uploaded_files = st.file_uploader(
             "Upload college documents (PDF, DOCX, or TXT)",
             type=['pdf', 'docx', 'doc', 'txt'],
             accept_multiple_files=True,
-            help="Upload one or more documents. They will be added to your existing documents."
+            help="Upload one or more documents. They will be added to your existing documents.",
+            label_visibility="collapsed"
         )
         
         if uploaded_files:
@@ -302,46 +508,65 @@ def main():
         
         st.divider()
         
-        # Show existing documents
+        # Show existing documents with attractive styling
         st.markdown("### 📁 Existing Documents")
         doc_files = get_document_files()
-        st.info(f"Found {len(doc_files)} document(s) in 'documents/' folder")
+        if doc_files:
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.75rem; border-radius: 10px; margin: 1rem 0; text-align: center;">
+                <p style="color: white; margin: 0; font-weight: 600;">📚 Found {len(doc_files)} document(s)</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.info("📁 No documents found. Upload documents to get started!")
         
         if doc_files:
-            with st.expander("View Documents"):
+            with st.expander("📋 View Documents", expanded=False):
                 for idx, doc in enumerate(doc_files):
                     doc_path = Path(doc)
-                    col1, col2 = st.columns([4, 1])
-                    with col1:
-                        st.text(doc_path.name)
-                    with col2:
-                        # Use full path hash or index to ensure unique key
-                        unique_key = f"delete_{hash(str(doc_path))}_{idx}"
-                        if st.button("🗑️", key=unique_key, help="Delete this document"):
-                            try:
-                                doc_path.unlink()
-                                st.success(f"Deleted {doc_path.name}")
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Error deleting: {e}")
+                    st.markdown(f"""
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; margin: 0.5rem 0; border-left: 4px solid #667eea;">
+                        <p style="margin: 0; font-weight: 500; color: #333;">📄 {doc_path.name}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    # Use full path hash or index to ensure unique key
+                    unique_key = f"delete_{hash(str(doc_path))}_{idx}"
+                    if st.button("🗑️ Delete", key=unique_key, help=f"Delete {doc_path.name}", use_container_width=True):
+                        try:
+                            doc_path.unlink()
+                            st.success(f"✅ Deleted {doc_path.name}")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error deleting: {e}")
         
         st.divider()
         
-        # Process documents button
+        # Process documents button with attractive styling
+        st.markdown("<br>", unsafe_allow_html=True)
         if st.button("🔄 Process Documents", type="primary", use_container_width=True):
             initialize_components()
             if process_documents():
                 st.session_state.chat_history = []  # Clear chat history
+                st.balloons()  # Celebration effect!
         
-        # Show vector store status
+        # Show vector store status with attractive styling
         if st.session_state.vector_store:
             count = st.session_state.vector_store.get_collection_count()
-            st.metric("Indexed Chunks", count)
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 10px; text-align: center; margin: 1rem 0;">
+                <h3 style="color: white; margin: 0; font-size: 2rem;">{count}</h3>
+                <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0;">Indexed Chunks</p>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.divider()
         
-        # Personalized Alerts Section
-        st.subheader("🔔 Personalized Alerts")
+        # Personalized Alerts Section with attractive header
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+            <h2 style="color: white; margin: 0; text-align: center;">🔔 Personalized Alerts</h2>
+        </div>
+        """, unsafe_allow_html=True)
         
         # Opt-in toggle
         alerts_enabled = st.checkbox(
@@ -443,14 +668,24 @@ def main():
     # Initialize components
     initialize_components()
     
-    # Check if documents are processed
+    # Check if documents are processed - with attractive welcome message
     if not st.session_state.documents_processed:
         if st.session_state.vector_store:
             count = st.session_state.vector_store.get_collection_count()
             if count > 0:
                 st.session_state.documents_processed = True
             else:
-                st.info("👆 Please process documents using the sidebar before asking questions.")
+                st.markdown("""
+                <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); padding: 2rem; border-radius: 15px; text-align: center; margin: 2rem 0;">
+                    <h2 style="color: #2d3436; margin: 0;">🚀 Get Started!</h2>
+                    <p style="color: #636e72; margin: 1rem 0 0 0; font-size: 1.1rem;">
+                        👆 Upload and process documents using the sidebar to start asking questions!
+                    </p>
+                    <p style="color: #636e72; margin: 0.5rem 0 0 0;">
+                        📤 Upload → 💾 Save → 🔄 Process → 💬 Ask Questions
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
                 return
     
     # Show alerts banner if enabled and there are urgent deadlines
@@ -460,40 +695,63 @@ def main():
         if urgent:
             st.warning(f"🔔 **Urgent Alert:** {len(urgent)} deadline(s) in the next 7 days! Check the sidebar for details.")
     
-    # Main chat interface
-    st.divider()
-    st.subheader("💬 Ask Your Question")
+    # Main chat interface with attractive styling
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 15px; margin: 2rem 0;">
+        <h2 style="color: white; margin: 0; text-align: center;">💬 Ask Your Question</h2>
+        <p style="color: rgba(255,255,255,0.9); text-align: center; margin: 0.5rem 0 0 0;">Get instant answers from your college documents</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Question type selector
+    # Question type selector with better styling
+    st.markdown("### 🎯 Question Mode")
     col1, col2, col3 = st.columns(3)
     with col1:
         question_mode = st.radio(
-            "Question Mode",
+            "Mode",
             ["Standard", "Multi-Document", "Summarize"],
             horizontal=True,
-            help="Standard: Single answer (with general info if needed)\nMulti-Document: Synthesize from multiple sources\nSummarize: Bulleted summary"
+            help="Standard: Single answer (prioritizes latest document)\nMulti-Document: Synthesize from multiple sources\nSummarize: Bulleted summary",
+            label_visibility="collapsed"
         )
     
-    # Chat history display
+    # Chat history display with attractive styling
     if st.session_state.chat_history:
-        st.subheader("📜 Chat History")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 📜 Chat History")
         for i, (question, answer, sources) in enumerate(st.session_state.chat_history):
-            with st.expander(f"Q: {question}", expanded=False):
-                st.markdown(f"**Answer:**\n{answer}")
-                if sources:
-                    st.caption(f"📎 {format_sources(sources)}")
-        st.divider()
+            st.markdown(f"""
+            <div class="chat-question">
+                <strong>Q{i+1}:</strong> {question}
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="chat-answer">
+                <strong>Answer:</strong><br>{answer}
+            </div>
+            """, unsafe_allow_html=True)
+            if sources:
+                source_badges = " ".join([f'<span class="badge badge-success">{s}</span>' for s in sources])
+                st.markdown(f'<div style="margin: 0.5rem 0;">📎 {source_badges}</div>', unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
     
-    # Question input
+    # Question input with attractive styling
+    st.markdown("<br>", unsafe_allow_html=True)
     question = st.text_input(
-        "Enter your question:",
-        placeholder="e.g., What's the fine for a late library book?",
-        key="question_input"
+        "💭 Enter your question:",
+        placeholder="e.g., What's the fine for a late library book? Or ask about policies, deadlines, fees...",
+        key="question_input",
+        label_visibility="visible"
     )
     
-    col1, col2 = st.columns([1, 4])
+    col1, col2, col3 = st.columns([1, 1, 3])
     with col1:
         ask_button = st.button("🔍 Ask", type="primary", use_container_width=True)
+    with col2:
+        if st.button("🗑️ Clear", use_container_width=True):
+            st.session_state.chat_history = []
+            st.rerun()
     
     # Process question
     if ask_button and question:
@@ -523,15 +781,20 @@ def main():
                     prioritize_source=latest_doc
                 )
             
-            # Display answer
-            st.markdown("### 💡 Answer")
+            # Display answer in attractive container
+            st.markdown("""
+            <div class="answer-container">
+                <h2 style="color: #667eea; margin-top: 0;">💡 Answer</h2>
+            </div>
+            """, unsafe_allow_html=True)
             st.markdown(result['answer'])
             
-            # Display sources
+            # Display sources with badges
             if result['sources']:
+                st.markdown("<br>", unsafe_allow_html=True)
                 st.markdown("### 📎 Sources")
-                for source in result['sources']:
-                    st.caption(f"• {source}")
+                source_badges = " ".join([f'<span class="badge badge-primary">{source}</span>' for source in result['sources']])
+                st.markdown(f'<div style="margin: 1rem 0;">{source_badges}</div>', unsafe_allow_html=True)
             
             # Add to chat history
             st.session_state.chat_history.append((
@@ -547,9 +810,21 @@ def main():
                     st.text(chunk['text'][:300] + "..." if len(chunk['text']) > 300 else chunk['text'])
                     st.caption(f"Distance: {chunk.get('distance', 'N/A'):.4f}" if chunk.get('distance') else "")
     
-    # Footer
-    st.divider()
-    st.caption("Campus Compass - Built with RAG (Retrieval-Augmented Generation) | Powered by OpenAI & ChromaDB")
+    # Attractive Footer
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 2rem; border-radius: 15px; text-align: center; margin-top: 3rem;">
+        <p style="color: #667eea; font-weight: 600; margin: 0; font-size: 1.1rem;">
+            🧭 Campus Compass
+        </p>
+        <p style="color: #666; margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+            Built with RAG (Retrieval-Augmented Generation) | Powered by Google Gemini & ChromaDB
+        </p>
+        <p style="color: #999; margin: 0.5rem 0 0 0; font-size: 0.8rem;">
+            ✨ Your AI-powered college information assistant
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
