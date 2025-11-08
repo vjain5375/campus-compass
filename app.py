@@ -346,22 +346,109 @@ def get_theme_css(dark_mode):
                 display: none !important;
                 visibility: hidden !important;
             }
-            /* Hide the secondary upload area (browse button section) */
-            [data-testid="stFileUploader"] > div > div:last-child {
+            /* Hide the entire secondary upload area (the gray box with cloud icon) - COMPLETE REMOVAL */
+            [data-testid="stFileUploader"] > div > div:last-child,
+            [data-testid="stFileUploader"] > div > div:nth-child(2),
+            [data-testid="stFileUploader"] > div > div[class*="upload"],
+            [data-testid="stFileUploader"] > div > div[class*="browse"] {
                 display: none !important;
                 visibility: hidden !important;
                 height: 0 !important;
+                width: 0 !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                overflow: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
-            /* Hide any additional upload buttons */
-            [data-testid="stFileUploader"] button[type="button"] {
+            
+            /* Hide all buttons and secondary upload sections */
+            [data-testid="stFileUploader"] button,
+            [data-testid="stFileUploader"] > div > div > button,
+            [data-testid="stFileUploader"] button[type="button"],
+            [data-testid="stFileUploader"] > div > div > div > button,
+            [data-testid="stFileUploader"] a,
+            [data-testid="stFileUploader"] > div > div > a {
                 display: none !important;
                 visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
-            /* Make upload containers position relative */
+            
+            /* Hide any additional upload containers that appear below */
+            [data-testid="stFileUploader"] ~ div,
+            [data-testid="stFileUploader"] + div {
+                display: none !important;
+            }
+            
+            /* Ensure only the first child (drag-drop area) is visible */
+            [data-testid="stFileUploader"] > div > div:not(:first-child) {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+            
+            /* Make upload wrappers and containers position relative */
+            #upload-wrapper-sidebar, #upload-wrapper-main,
             #upload-container-sidebar, #upload-container-main {
                 position: relative !important;
+                overflow: visible !important;
+            }
+            
+            /* Make file uploader inside wrapper completely transparent and overlay */
+            #upload-wrapper-sidebar [data-testid="stFileUploader"],
+            #upload-wrapper-main [data-testid="stFileUploader"] {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                z-index: 10 !important;
+            }
+            
+            /* Make the drag and drop area transparent and fill the container */
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] > div,
+            #upload-wrapper-main [data-testid="stFileUploader"] > div {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+            }
+            
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] > div > div:first-child,
+            #upload-wrapper-main [data-testid="stFileUploader"] > div > div:first-child {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+                cursor: pointer !important;
+                min-height: 100% !important;
+            }
+            
+            /* Hide all text, icons, and native UI from file uploader */
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] > div > div:first-child > *,
+            #upload-wrapper-main [data-testid="stFileUploader"] > div > div:first-child > * {
+                display: none !important;
+                visibility: hidden !important;
             }
         </style>
         """
@@ -784,26 +871,55 @@ def get_theme_css(dark_mode):
                 visibility: hidden !important;
             }
             
-            /* Hide the entire secondary upload area (the gray box with cloud icon) */
-            [data-testid="stFileUploader"] > div > div:last-child {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow: hidden !important;
-            }
-            
-            /* Hide all buttons */
-            [data-testid="stFileUploader"] button,
-            [data-testid="stFileUploader"] > div > div > button,
-            [data-testid="stFileUploader"] button[type="button"] {
+            /* Hide the entire secondary upload area (the gray box with cloud icon) - COMPLETE REMOVAL */
+            [data-testid="stFileUploader"] > div > div:last-child,
+            [data-testid="stFileUploader"] > div > div:nth-child(2),
+            [data-testid="stFileUploader"] > div > div[class*="upload"],
+            [data-testid="stFileUploader"] > div > div[class*="browse"] {
                 display: none !important;
                 visibility: hidden !important;
                 height: 0 !important;
                 width: 0 !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                overflow: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+            
+            /* Hide all buttons and secondary upload sections */
+            [data-testid="stFileUploader"] button,
+            [data-testid="stFileUploader"] > div > div > button,
+            [data-testid="stFileUploader"] button[type="button"],
+            [data-testid="stFileUploader"] > div > div > div > button,
+            [data-testid="stFileUploader"] a,
+            [data-testid="stFileUploader"] > div > div > a {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+            
+            /* Hide any additional upload containers that appear below */
+            [data-testid="stFileUploader"] ~ div,
+            [data-testid="stFileUploader"] + div {
+                display: none !important;
+            }
+            
+            /* Ensure only the first child (drag-drop area) is visible */
+            [data-testid="stFileUploader"] > div > div:not(:first-child) {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
             
             /* Hide branding but keep sidebar toggle visible */
