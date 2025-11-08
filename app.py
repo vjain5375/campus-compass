@@ -1188,11 +1188,19 @@ def main():
             </div>
         </div>
         <script>
-            // Move file uploader into the container after it loads
-            setTimeout(function() {{
+            // Enhanced: Make dotted area fully clickable for file upload
+            function setupFileUploader() {{
                 const wrapper = document.getElementById('upload-wrapper-sidebar');
-                const uploader = wrapper?.nextElementSibling?.querySelector('[data-testid="stFileUploader"]');
+                if (!wrapper) return;
+                
+                // Try multiple ways to find the file uploader
+                let uploader = wrapper.nextElementSibling?.querySelector('[data-testid="stFileUploader"]');
+                if (!uploader) {{
+                    uploader = document.querySelector('[data-testid="stFileUploader"]');
+                }}
+                
                 if (uploader && wrapper) {{
+                    // Position uploader to overlay the dotted container
                     uploader.style.position = 'absolute';
                     uploader.style.top = '0';
                     uploader.style.left = '0';
@@ -1201,9 +1209,50 @@ def main():
                     uploader.style.width = '100%';
                     uploader.style.height = '100%';
                     uploader.style.zIndex = '10';
-                    wrapper.appendChild(uploader);
+                    uploader.style.opacity = '0';
+                    uploader.style.cursor = 'pointer';
+                    
+                    // Move uploader into wrapper
+                    if (uploader.parentNode !== wrapper) {{
+                        wrapper.appendChild(uploader);
+                    }}
+                    
+                    // Find and make the file input clickable
+                    const fileInput = uploader.querySelector('input[type="file"]');
+                    if (fileInput) {{
+                        fileInput.style.position = 'absolute';
+                        fileInput.style.top = '0';
+                        fileInput.style.left = '0';
+                        fileInput.style.width = '100%';
+                        fileInput.style.height = '100%';
+                        fileInput.style.opacity = '0';
+                        fileInput.style.cursor = 'pointer';
+                        fileInput.style.zIndex = '11';
+                    }}
+                    
+                    // Make the container clickable too
+                    const container = document.getElementById('upload-container-sidebar');
+                    if (container && fileInput) {{
+                        container.addEventListener('click', function(e) {{
+                            if (e.target !== fileInput) {{
+                                fileInput.click();
+                            }}
+                        }});
+                    }}
                 }}
-            }}, 100);
+            }}
+            
+            // Try multiple times to ensure it works
+            setTimeout(setupFileUploader, 100);
+            setTimeout(setupFileUploader, 500);
+            setTimeout(setupFileUploader, 1000);
+            
+            // Also try when DOM is ready
+            if (document.readyState === 'loading') {{
+                document.addEventListener('DOMContentLoaded', setupFileUploader);
+            }} else {{
+                setupFileUploader();
+            }}
         </script>
         """, unsafe_allow_html=True)
         
@@ -1491,11 +1540,22 @@ def main():
                     </div>
                 </div>
                 <script>
-                    // Move file uploader into the container after it loads
-                    setTimeout(function() {{
+                    // Enhanced: Make dotted area fully clickable for file upload
+                    function setupMainFileUploader() {{
                         const wrapper = document.getElementById('upload-wrapper-main');
-                        const uploader = wrapper?.nextElementSibling?.querySelector('[data-testid="stFileUploader"]');
+                        if (!wrapper) return;
+                        
+                        // Try multiple ways to find the file uploader
+                        let uploader = wrapper.nextElementSibling?.querySelector('[data-testid="stFileUploader"]');
+                        if (!uploader) {{
+                            uploader = document.querySelector('[data-testid="stFileUploader"][key="main_uploader"]');
+                        }}
+                        if (!uploader) {{
+                            uploader = document.querySelectorAll('[data-testid="stFileUploader"]')[1];
+                        }}
+                        
                         if (uploader && wrapper) {{
+                            // Position uploader to overlay the dotted container
                             uploader.style.position = 'absolute';
                             uploader.style.top = '0';
                             uploader.style.left = '0';
@@ -1504,9 +1564,50 @@ def main():
                             uploader.style.width = '100%';
                             uploader.style.height = '100%';
                             uploader.style.zIndex = '10';
-                            wrapper.appendChild(uploader);
+                            uploader.style.opacity = '0';
+                            uploader.style.cursor = 'pointer';
+                            
+                            // Move uploader into wrapper
+                            if (uploader.parentNode !== wrapper) {{
+                                wrapper.appendChild(uploader);
+                            }}
+                            
+                            // Find and make the file input clickable
+                            const fileInput = uploader.querySelector('input[type="file"]');
+                            if (fileInput) {{
+                                fileInput.style.position = 'absolute';
+                                fileInput.style.top = '0';
+                                fileInput.style.left = '0';
+                                fileInput.style.width = '100%';
+                                fileInput.style.height = '100%';
+                                fileInput.style.opacity = '0';
+                                fileInput.style.cursor = 'pointer';
+                                fileInput.style.zIndex = '11';
+                            }}
+                            
+                            // Make the container clickable too
+                            const container = document.getElementById('upload-container-main');
+                            if (container && fileInput) {{
+                                container.addEventListener('click', function(e) {{
+                                    if (e.target !== fileInput) {{
+                                        fileInput.click();
+                                    }}
+                                }});
+                            }}
                         }}
-                    }}, 100);
+                    }}
+                    
+                    // Try multiple times to ensure it works
+                    setTimeout(setupMainFileUploader, 100);
+                    setTimeout(setupMainFileUploader, 500);
+                    setTimeout(setupMainFileUploader, 1000);
+                    
+                    // Also try when DOM is ready
+                    if (document.readyState === 'loading') {{
+                        document.addEventListener('DOMContentLoaded', setupMainFileUploader);
+                    }} else {{
+                        setupMainFileUploader();
+                    }}
                 </script>
                 """, unsafe_allow_html=True)
                 
