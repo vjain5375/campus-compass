@@ -154,12 +154,28 @@ def get_theme_css(dark_mode):
                 margin: 1rem 0;
                 border: 1px solid rgba(102, 126, 234, 0.3);
                 transition: all 0.3s ease;
+                height: 100%;
+                min-height: 180px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
             
             .feature-card:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
                 border-color: rgba(102, 126, 234, 0.6);
+            }
+            
+            /* Ensure columns have equal height */
+            [data-testid="column"] {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            [data-testid="column"] > div {
+                flex: 1;
+                display: flex;
             }
             
             /* Buttons */
@@ -332,11 +348,27 @@ def get_theme_css(dark_mode):
                 margin: 1rem 0;
                 border: 1px solid rgba(102, 126, 234, 0.2);
                 transition: all 0.3s ease;
+                height: 100%;
+                min-height: 180px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
             
             .feature-card:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
+            }
+            
+            /* Ensure columns have equal height */
+            [data-testid="column"] {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            [data-testid="column"] > div {
+                flex: 1;
+                display: flex;
             }
             
             /* Buttons */
