@@ -992,10 +992,11 @@ def main():
         st.markdown(f"""
         <div id="upload-wrapper-sidebar" style="position: relative; margin: 1rem 0;">
             <div id="upload-container-sidebar" style="position: relative; background: {upload_bg}; padding: 2rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">☁️</div>
                 <p style="margin: 0; color: {upload_text}; font-weight: 600; font-size: 1.1rem;">
-                    📎 Drag and drop files here or click to browse
+                    Drag and drop files here or click to browse
                 </p>
-                <p style="margin: 0.5rem 0 0 0; color: {upload_info_text}; font-size: 0.9rem;">
+                <p style="margin: 0.8rem 0 0 0; color: {upload_info_text}; font-size: 0.9rem;">
                     Limit 200MB per file • PDF, DOCX, DOC, TXT
                 </p>
             </div>
@@ -1294,10 +1295,11 @@ def main():
                 st.markdown(f"""
                 <div id="upload-wrapper-main" style="position: relative; margin: 1rem 0;">
                     <div id="upload-container-main" style="position: relative; background: {main_upload_bg}; padding: 2.5rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1;">
+                        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">☁️</div>
                         <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.2rem;">
-                            📎 Drag and drop files here or click to browse
+                            Drag and drop files here or click to browse
                         </p>
-                        <p style="margin: 0.5rem 0 0 0; color: {main_upload_info_text}; font-size: 0.9rem;">
+                        <p style="margin: 0.8rem 0 0 0; color: {main_upload_info_text}; font-size: 0.9rem;">
                             Limit 200MB per file • PDF, DOCX, DOC, TXT
                         </p>
                     </div>
