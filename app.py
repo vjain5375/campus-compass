@@ -509,10 +509,12 @@ def get_theme_css(dark_mode):
                 box-shadow: 0 4px 15px rgba(30, 41, 59, 0.4) !important;
                 border: 2px solid #334155 !important;
                 visibility: visible !important;
-                display: block !important;
+                display: flex !important;
                 opacity: 1 !important;
                 width: 100% !important;
                 min-height: 50px !important;
+                align-items: center !important;
+                gap: 0.5rem !important;
             }
             
             [data-testid="stToggle"] > label {
@@ -522,38 +524,51 @@ def get_theme_css(dark_mode):
                 visibility: visible !important;
                 display: block !important;
                 opacity: 1 !important;
+                flex: 1 !important;
             }
             
-            /* Toggle switch itself */
+            /* Toggle switch container */
             [data-testid="stToggle"] > div {
+                visibility: visible !important;
+                display: flex !important;
+                opacity: 1 !important;
+                align-items: center !important;
+                min-width: 50px !important;
+            }
+            
+            /* Toggle switch track (the background slider) */
+            [data-testid="stToggle"] > div > div {
                 visibility: visible !important;
                 display: block !important;
                 opacity: 1 !important;
+                background: #475569 !important;
+                border: 2px solid #64748b !important;
+                min-width: 44px !important;
+                min-height: 24px !important;
+                border-radius: 12px !important;
+                position: relative !important;
             }
             
+            /* Toggle switch button (the circle that moves) */
             [data-testid="stToggle"] button,
             [data-testid="stToggle"] > div > button,
             [data-testid="stToggle"] > div > div > button {
                 visibility: visible !important;
                 display: block !important;
                 opacity: 1 !important;
-                background: #334155 !important;
-                border: 2px solid #475569 !important;
-                color: #ffffff !important;
-                min-width: 40px !important;
-                min-height: 24px !important;
+                background: #ffffff !important;
+                border: 2px solid #334155 !important;
+                color: #1e293b !important;
+                min-width: 20px !important;
+                min-height: 20px !important;
+                border-radius: 50% !important;
+                position: absolute !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
             }
             
             /* Ensure toggle container is visible */
             [data-testid="stToggle"] * {
                 visibility: visible !important;
-            }
-            
-            /* Toggle switch track */
-            [data-testid="stToggle"] > div > div {
-                visibility: visible !important;
-                display: block !important;
-                opacity: 1 !important;
             }
             
             [data-testid="stToggle"]:hover {
@@ -856,6 +871,8 @@ def main():
     with st.sidebar:
         # Theme Toggle at the top - Enhanced
         st.markdown("### 🎨 Theme")
+        
+        # Hidden toggle for functionality (but make it visible)
         dark_mode = st.toggle(
             "🌙 Dark Mode / ☀️ Light Mode", 
             value=st.session_state.dark_mode, 
@@ -866,7 +883,7 @@ def main():
             st.session_state.dark_mode = dark_mode
             st.rerun()
         
-        # Theme indicator with attractive styling - Dark in light mode
+        # Theme indicator with attractive styling - Clickable box
         if dark_mode:
             theme_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
             theme_text = "white"
@@ -876,12 +893,55 @@ def main():
         theme_icon = "🌙" if dark_mode else "☀️"
         theme_label = "Dark Mode" if dark_mode else "Light Mode"
         
+        # Make the theme indicator box clickable using a button
+        theme_clicked = st.button(
+            f"{theme_icon} {theme_label}",
+            key="theme_indicator_button",
+            use_container_width=True,
+            help="Click to toggle between Dark and Light mode"
+        )
+        if theme_clicked:
+            st.session_state.dark_mode = not st.session_state.dark_mode
+            st.rerun()
+        
+        # Style the button to look like the original box using JavaScript injection
         st.markdown(f"""
-        <div style="text-align: center; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; background: {theme_bg}; box-shadow: 0 4px 15px rgba(30, 41, 59, 0.4); border: 2px solid #334155;">
-            <p style="margin: 0; color: {theme_text}; font-weight: 700; font-size: 1.1rem;">
-                {theme_icon} {theme_label}
-            </p>
-        </div>
+        <script>
+            (function() {{
+                function styleThemeButton() {{
+                    // Find the button by its text content or key
+                    const buttons = document.querySelectorAll('button');
+                    for (let btn of buttons) {{
+                        if (btn.textContent.includes('{theme_label}') || btn.textContent.includes('{theme_icon}')) {{
+                            btn.style.background = '{theme_bg}' + ' !important';
+                            btn.style.color = '{theme_text}' + ' !important';
+                            btn.style.border = '2px solid #334155' + ' !important';
+                            btn.style.borderRadius = '12px' + ' !important';
+                            btn.style.padding = '1rem' + ' !important';
+                            btn.style.marginBottom = '1rem' + ' !important';
+                            btn.style.boxShadow = '0 4px 15px rgba(30, 41, 59, 0.4)' + ' !important';
+                            btn.style.fontWeight = '700' + ' !important';
+                            btn.style.fontSize = '1.1rem' + ' !important';
+                            btn.style.textAlign = 'center' + ' !important';
+                            btn.style.transition = 'all 0.3s ease' + ' !important';
+                            btn.style.cursor = 'pointer' + ' !important';
+                            btn.onmouseenter = function() {{
+                                this.style.transform = 'translateY(-2px)' + ' !important';
+                                this.style.boxShadow = '0 6px 20px rgba(30, 41, 59, 0.6)' + ' !important';
+                            }};
+                            btn.onmouseleave = function() {{
+                                this.style.transform = 'translateY(0)' + ' !important';
+                                this.style.boxShadow = '0 4px 15px rgba(30, 41, 59, 0.4)' + ' !important';
+                            }};
+                            break;
+                        }}
+                    }}
+                }}
+                styleThemeButton();
+                setTimeout(styleThemeButton, 100);
+                setTimeout(styleThemeButton, 500);
+            }})();
+        </script>
         """, unsafe_allow_html=True)
         
         st.divider()
