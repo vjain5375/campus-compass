@@ -32,3 +32,6 @@ Thumbs.db
 # documents/*.docx
 # documents/*.txt
 
+# Alerts data
+alerts.json
+
