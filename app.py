@@ -687,24 +687,24 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # File uploader for new documents with attractive styling
-        st.markdown("### 📤 Upload Documents")
-        upload_bg = "rgba(102, 126, 234, 0.1)" if st.session_state.dark_mode else "#f0f4ff"
-        upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
-        st.markdown(f"""
-        <div style="background: {upload_bg}; padding: 1.5rem; border-radius: 15px; border: 2px dashed #667eea; margin: 1rem 0; text-align: center;">
-            <p style="margin: 0; color: {upload_text}; font-weight: 600; font-size: 1.1rem;">
-                📎 Drag and drop files here or click to browse
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        uploaded_files = st.file_uploader(
-            "Upload college documents (PDF, DOCX, or TXT)",
-            type=['pdf', 'docx', 'doc', 'txt'],
-            accept_multiple_files=True,
-            help="Upload one or more documents. They will be added to your existing documents.",
-            label_visibility="collapsed"
-        )
+        # Upload Documents Section - Collapsible and Prominent
+        with st.expander("📤 **Upload Documents** (Click to expand/collapse)", expanded=True):
+            upload_bg = "rgba(102, 126, 234, 0.1)" if st.session_state.dark_mode else "#f0f4ff"
+            upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
+            st.markdown(f"""
+            <div style="background: {upload_bg}; padding: 1.5rem; border-radius: 15px; border: 2px dashed #667eea; margin: 1rem 0; text-align: center;">
+                <p style="margin: 0; color: {upload_text}; font-weight: 600; font-size: 1.1rem;">
+                    📎 Drag and drop files here or click to browse
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            uploaded_files = st.file_uploader(
+                "Upload college documents (PDF, DOCX, or TXT)",
+                type=['pdf', 'docx', 'doc', 'txt'],
+                accept_multiple_files=True,
+                help="Upload one or more documents. They will be added to your existing documents.",
+                label_visibility="collapsed"
+            )
         
         if uploaded_files:
             if st.button("💾 Save Uploaded Documents", type="primary", use_container_width=True):
