@@ -486,6 +486,40 @@ def get_theme_css(dark_mode):
                 display: none !important;
                 visibility: hidden !important;
             }
+            
+            /* Completely hide all file uploader default UI (black section) */
+            [data-testid="stFileUploader"] {
+                opacity: 0 !important;
+                position: absolute !important;
+                pointer-events: none !important;
+                height: 0 !important;
+                width: 0 !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Only allow file input to work when inside our custom wrapper */
+            #upload-wrapper-main [data-testid="stFileUploader"],
+            #upload-wrapper-sidebar [data-testid="stFileUploader"] {
+                opacity: 0 !important;
+                pointer-events: auto !important;
+                height: 100% !important;
+                width: 100% !important;
+                position: absolute !important;
+            }
+            
+            /* Hide all default Streamlit uploader content */
+            [data-testid="stFileUploader"] > div {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            /* Only show file input */
+            [data-testid="stFileUploader"] input[type="file"] {
+                display: block !important;
+                visibility: visible !important;
+            }
         </style>
         """
     else:
@@ -1440,9 +1474,30 @@ def main():
                     (function() {{
                         function setupMainUpload() {{
                             const container = document.getElementById('upload-container-main');
-                            const uploader = document.querySelector('[data-testid="stFileUploader"]');
+                            const wrapper = document.getElementById('upload-wrapper-main');
+                            if (!container || !wrapper) return;
                             
-                            if (!container || !uploader) return;
+                            // Find the file uploader
+                            let uploader = document.querySelector('[data-testid="stFileUploader"]');
+                            if (!uploader) return;
+                            
+                            // Hide all default Streamlit uploader UI
+                            uploader.style.display = 'none';
+                            uploader.style.visibility = 'hidden';
+                            uploader.style.opacity = '0';
+                            uploader.style.height = '0';
+                            uploader.style.width = '0';
+                            uploader.style.position = 'absolute';
+                            uploader.style.pointerEvents = 'none';
+                            
+                            // Hide all children of uploader
+                            const uploaderChildren = uploader.querySelectorAll('*');
+                            uploaderChildren.forEach(child => {{
+                                if (child.tagName !== 'INPUT') {{
+                                    child.style.display = 'none';
+                                    child.style.visibility = 'hidden';
+                                }}
+                            }});
                             
                             // Find file input
                             let fileInput = uploader.querySelector('input[type="file"]');
@@ -1450,50 +1505,73 @@ def main():
                                 fileInput = uploader.querySelector('input');
                             }}
                             
-                            if (fileInput && container) {{
+                            if (fileInput) {{
+                                // Move file input into wrapper
+                                if (fileInput.parentNode !== wrapper) {{
+                                    wrapper.appendChild(fileInput);
+                                }}
+                                
+                                // Style file input to cover the dotted area
+                                fileInput.style.position = 'absolute';
+                                fileInput.style.top = '0';
+                                fileInput.style.left = '0';
+                                fileInput.style.width = '100%';
+                                fileInput.style.height = '100%';
+                                fileInput.style.opacity = '0';
+                                fileInput.style.cursor = 'pointer';
+                                fileInput.style.zIndex = '999';
+                                fileInput.style.pointerEvents = 'auto';
+                                
                                 // Make container clickable
-                                container.onclick = function() {{
+                                container.onclick = function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                     fileInput.click();
                                 }};
                                 
-                                // Position file input over container
-                                const wrapper = document.getElementById('upload-wrapper-main');
-                                if (wrapper && uploader.parentNode !== wrapper) {{
-                                    uploader.style.position = 'absolute';
-                                    uploader.style.top = '0';
-                                    uploader.style.left = '0';
-                                    uploader.style.width = '100%';
-                                    uploader.style.height = '100%';
-                                    uploader.style.opacity = '0';
-                                    uploader.style.zIndex = '10';
-                                    uploader.style.pointerEvents = 'none';
-                                    wrapper.appendChild(uploader);
-                                }}
+                                // Also handle drag and drop
+                                container.ondragover = function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    container.style.borderColor = '#818cf8';
+                                }};
                                 
-                                if (fileInput) {{
-                                    fileInput.style.position = 'absolute';
-                                    fileInput.style.top = '0';
-                                    fileInput.style.left = '0';
-                                    fileInput.style.width = '100%';
-                                    fileInput.style.height = '100%';
-                                    fileInput.style.opacity = '0';
-                                    fileInput.style.cursor = 'pointer';
-                                    fileInput.style.zIndex = '999';
-                                }}
+                                container.ondragleave = function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    container.style.borderColor = '#667eea';
+                                }};
+                                
+                                container.ondrop = function(e) {{
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    container.style.borderColor = '#667eea';
+                                    if (e.dataTransfer.files.length > 0) {{
+                                        fileInput.files = e.dataTransfer.files;
+                                        const event = new Event('change', {{ bubbles: true }});
+                                        fileInput.dispatchEvent(event);
+                                    }}
+                                }};
                             }}
                         }}
                         
-                        // Try immediately and on intervals
+                        // Try multiple times to ensure it works
                         setupMainUpload();
                         setTimeout(setupMainUpload, 100);
+                        setTimeout(setupMainUpload, 300);
                         setTimeout(setupMainUpload, 500);
                         setTimeout(setupMainUpload, 1000);
+                        setTimeout(setupMainUpload, 2000);
                         
                         // Also on DOM ready
                         if (document.readyState === 'loading') {{
                             document.addEventListener('DOMContentLoaded', setupMainUpload);
                         }}
                         window.addEventListener('load', setupMainUpload);
+                        
+                        // Also watch for Streamlit reruns
+                        const observer = new MutationObserver(setupMainUpload);
+                        observer.observe(document.body, {{ childList: true, subtree: true }});
                     }})();
                 </script>
                 """, unsafe_allow_html=True)
