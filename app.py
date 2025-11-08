@@ -281,9 +281,12 @@ def get_theme_css(dark_mode):
             /* Keep header visible for sidebar toggle */
             header {visibility: visible !important;}
             /* Ensure sidebar toggle button is visible */
-            button[title="View sidebar"] {visibility: visible !important; display: block !important;}
-            [data-testid="collapsedControl"] {visibility: visible !important; display: block !important;}
-            [data-testid="stSidebarCollapseButton"] {visibility: visible !important; display: block !important;}
+            button[title="View sidebar"] {visibility: visible !important; display: block !important; opacity: 1 !important; z-index: 9999 !important;}
+            [data-testid="collapsedControl"] {visibility: visible !important; display: block !important; opacity: 1 !important; z-index: 9999 !important;}
+            [data-testid="stSidebarCollapseButton"] {visibility: visible !important; display: block !important; opacity: 1 !important; z-index: 9999 !important;}
+            /* Sidebar toggle button styling */
+            .stApp > header {visibility: visible !important;}
+            .stApp > header button {visibility: visible !important; display: block !important; opacity: 1 !important;}
             
             /* Scrollbar */
             ::-webkit-scrollbar {
@@ -468,9 +471,12 @@ def get_theme_css(dark_mode):
             /* Keep header visible for sidebar toggle */
             header {visibility: visible !important;}
             /* Ensure sidebar toggle button is visible */
-            button[title="View sidebar"] {visibility: visible !important; display: block !important;}
-            [data-testid="collapsedControl"] {visibility: visible !important; display: block !important;}
-            [data-testid="stSidebarCollapseButton"] {visibility: visible !important; display: block !important;}
+            button[title="View sidebar"] {visibility: visible !important; display: block !important; opacity: 1 !important; z-index: 9999 !important;}
+            [data-testid="collapsedControl"] {visibility: visible !important; display: block !important; opacity: 1 !important; z-index: 9999 !important;}
+            [data-testid="stSidebarCollapseButton"] {visibility: visible !important; display: block !important; opacity: 1 !important; z-index: 9999 !important;}
+            /* Sidebar toggle button styling */
+            .stApp > header {visibility: visible !important;}
+            .stApp > header button {visibility: visible !important; display: block !important; opacity: 1 !important;}
         </style>
         """
 
