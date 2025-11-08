@@ -961,6 +961,99 @@ def main():
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
+                
+                # Second Upload Section in Main Content Area
+                st.markdown("<br>", unsafe_allow_html=True)
+                upload_section_bg = "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)" if st.session_state.dark_mode else "white"
+                upload_section_border = "rgba(102, 126, 234, 0.3)" if st.session_state.dark_mode else "rgba(102, 126, 234, 0.2)"
+                upload_section_text = "#e0e0e0" if st.session_state.dark_mode else "#2d3436"
+                upload_section_subtext = "#b0b0b0" if st.session_state.dark_mode else "#666"
+                
+                st.markdown(f"""
+                <div style="background: {upload_section_bg}; padding: 2.5rem; border-radius: 20px; margin: 2rem 0; box-shadow: 0 15px 40px rgba(0,0,0,0.3); border: 2px solid {upload_section_border};">
+                    <h2 style="color: {upload_section_text}; margin: 0 0 1.5rem 0; font-size: 2rem; font-weight: 700; text-align: center;">📤 Upload Documents</h2>
+                    <p style="color: {upload_section_subtext}; text-align: center; margin: 0 0 1.5rem 0; font-size: 1.1rem;">
+                        Upload your college documents (PDF, DOCX, or TXT) to get started
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # File uploader in main content
+                main_upload_bg = "rgba(102, 126, 234, 0.1)" if st.session_state.dark_mode else "#f0f4ff"
+                main_upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
+                st.markdown(f"""
+                <div style="background: {main_upload_bg}; padding: 2rem; border-radius: 15px; border: 3px dashed #667eea; margin: 1rem 0; text-align: center;">
+                    <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.2rem;">
+                        📎 Drag and drop files here or click to browse
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                main_uploaded_files = st.file_uploader(
+                    "Upload college documents (PDF, DOCX, or TXT)",
+                    type=['pdf', 'docx', 'doc', 'txt'],
+                    accept_multiple_files=True,
+                    help="Upload one or more documents. They will be added to your existing documents.",
+                    label_visibility="collapsed",
+                    key="main_uploader"
+                )
+                
+                # Save button for main upload
+                if main_uploaded_files:
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        if st.button("💾 Save Uploaded Documents", type="primary", use_container_width=True, key="save_main_uploaded_files"):
+                            docs_dir = ensure_documents_directory()
+                            
+                            with st.spinner("Saving documents..."):
+                                saved_count = 0
+                                skipped_count = 0
+                                errors = []
+                                
+                                try:
+                                    for uploaded_file in main_uploaded_files:
+                                        try:
+                                            # Determine file extension
+                                            file_ext = Path(uploaded_file.name).suffix.lower()
+                                            if file_ext not in ['.pdf', '.docx', '.doc', '.txt']:
+                                                errors.append(f"{uploaded_file.name}: Unsupported format")
+                                                skipped_count += 1
+                                                continue
+                                            
+                                            # Get target file path
+                                            file_path = docs_dir / uploaded_file.name
+                                            
+                                            # If file with same name exists, skip it (don't overwrite)
+                                            if file_path.exists():
+                                                skipped_count += 1
+                                                errors.append(f"{uploaded_file.name}: File already exists (skipped)")
+                                                continue
+                                            
+                                            # Save new file
+                                            with open(file_path, "wb") as f:
+                                                f.write(uploaded_file.getbuffer())
+                                            saved_count += 1
+                                            
+                                        except Exception as e:
+                                            errors.append(f"{uploaded_file.name}: {str(e)}")
+                                            skipped_count += 1
+                                    
+                                    # Show results
+                                    if saved_count > 0:
+                                        st.success(f"✅ Saved {saved_count} document(s)!")
+                                    if skipped_count > 0:
+                                        for error in errors:
+                                            st.warning(f"⚠️ {error}")
+                                    
+                                    if saved_count > 0:
+                                        st.info("💡 Click '🔄 Process Documents' in the sidebar to index the new documents, then you can start asking questions!")
+                                        # Don't clear vector store - just mark that reprocessing is needed
+                                        st.session_state.documents_processed = False
+                                        st.rerun()
+                                except Exception as e:
+                                    st.error(f"Error saving documents: {str(e)}")
+                
                 return
     
     # Show alerts banner if enabled and there are urgent deadlines
