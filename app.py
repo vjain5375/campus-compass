@@ -300,32 +300,42 @@ def get_theme_css(dark_mode):
                 border-radius: 5px;
             }
             
-            /* Unified Upload Interface - Merge into single dotted-line box */
+            /* Make file uploader transparent and position it over the dotted section */
             [data-testid="stFileUploader"] {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
                 background: transparent !important;
                 border: none !important;
                 padding: 0 !important;
+                margin: 0 !important;
+                z-index: 10 !important;
             }
-            /* Style the drag and drop area to match the dotted-line design */
+            /* Make the drag and drop area transparent and fill the container */
+            [data-testid="stFileUploader"] > div {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+            }
             [data-testid="stFileUploader"] > div > div:first-child {
-                background: rgba(102, 126, 234, 0.1) !important;
-                border: 3px dashed #667eea !important;
-                border-radius: 15px !important;
-                padding: 2.5rem 1.5rem !important;
-                text-align: center !important;
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
                 cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                min-height: 150px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
             }
-            [data-testid="stFileUploader"] > div > div:first-child:hover {
-                background: rgba(102, 126, 234, 0.15) !important;
-                border-color: #764ba2 !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+            /* Hide all text and icons from file uploader */
+            [data-testid="stFileUploader"] > div > div:first-child > div {
+                display: none !important;
             }
             /* Hide browse button and secondary upload area */
             [data-testid="stFileUploader"] button {
@@ -349,11 +359,9 @@ def get_theme_css(dark_mode):
                 display: none !important;
                 visibility: hidden !important;
             }
-            /* Style the text inside the upload area */
-            [data-testid="stFileUploader"] > div > div:first-child > div {
-                color: #e0e0e0 !important;
-                font-weight: 600 !important;
-                font-size: 1.1rem !important;
+            /* Make upload containers position relative */
+            #upload-container-sidebar, #upload-container-main {
+                position: relative !important;
             }
         </style>
         """
@@ -566,32 +574,42 @@ def get_theme_css(dark_mode):
                 background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
             }
             
-            /* Unified Upload Interface - Merge into single dotted-line box */
+            /* Make file uploader transparent and position it over the dotted section */
             [data-testid="stFileUploader"] {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
                 background: transparent !important;
                 border: none !important;
                 padding: 0 !important;
+                margin: 0 !important;
+                z-index: 10 !important;
             }
-            /* Style the drag and drop area to match the dotted-line design */
+            /* Make the drag and drop area transparent and fill the container */
+            [data-testid="stFileUploader"] > div {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
+            }
             [data-testid="stFileUploader"] > div > div:first-child {
-                background: #f0f4ff !important;
-                border: 3px dashed #667eea !important;
-                border-radius: 15px !important;
-                padding: 2.5rem 1.5rem !important;
-                text-align: center !important;
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: 100% !important;
+                width: 100% !important;
                 cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                min-height: 150px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
             }
-            [data-testid="stFileUploader"] > div > div:first-child:hover {
-                background: #e0e7ff !important;
-                border-color: #764ba2 !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+            /* Hide all text and icons from file uploader */
+            [data-testid="stFileUploader"] > div > div:first-child > div {
+                display: none !important;
             }
             /* Hide browse button and secondary upload area */
             [data-testid="stFileUploader"] button {
@@ -615,11 +633,9 @@ def get_theme_css(dark_mode):
                 display: none !important;
                 visibility: hidden !important;
             }
-            /* Style the text inside the upload area */
-            [data-testid="stFileUploader"] > div > div:first-child > div {
-                color: #667eea !important;
-                font-weight: 600 !important;
-                font-size: 1.1rem !important;
+            /* Make upload containers position relative */
+            #upload-container-sidebar, #upload-container-main {
+                position: relative !important;
             }
             
             /* Hide branding but keep sidebar toggle visible */
@@ -860,8 +876,25 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # Upload Documents Section - Unified Dotted-Line Interface
+        # Upload Documents Section - Dotted Section as Upload Interface
         st.markdown("### 📤 Upload Documents")
+        upload_bg = "rgba(102, 126, 234, 0.1)" if st.session_state.dark_mode else "#f0f4ff"
+        upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
+        upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
+        
+        # Create container for the dotted upload area
+        st.markdown(f"""
+        <div id="upload-container-sidebar" style="position: relative; background: {upload_bg}; padding: 2rem; border-radius: 15px; border: 3px dashed #667eea; margin: 1rem 0; text-align: center; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
+            <p style="margin: 0; color: {upload_text}; font-weight: 600; font-size: 1.1rem;">
+                📎 Drag and drop files here or click to browse
+            </p>
+            <p style="margin: 0.5rem 0 0 0; color: {upload_info_text}; font-size: 0.9rem;">
+                Limit 200MB per file • PDF, DOCX, DOC, TXT
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # File uploader positioned to overlay the dotted section
         uploaded_files = st.file_uploader(
             "Upload college documents (PDF, DOCX, or TXT)",
             type=['pdf', 'docx', 'doc', 'txt'],
@@ -869,15 +902,6 @@ def main():
             help="Upload one or more documents. They will be added to your existing documents.",
             label_visibility="collapsed"
         )
-        # File type and size info below uploader
-        upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
-        st.markdown(f"""
-        <div style="text-align: center; margin-top: 0.5rem;">
-            <p style="margin: 0; color: {upload_info_text}; font-size: 0.9rem;">
-                📎 Limit 200MB per file • PDF, DOCX, DOC, TXT
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
         
         # Save button - always visible when files are uploaded
         if uploaded_files:
@@ -1135,7 +1159,24 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # File uploader in main content - Unified Dotted-Line Interface
+                # File uploader in main content - Dotted Section as Upload Interface
+                main_upload_bg = "rgba(102, 126, 234, 0.1)" if st.session_state.dark_mode else "#f0f4ff"
+                main_upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
+                main_upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
+                
+                # Create container for the dotted upload area
+                st.markdown(f"""
+                <div id="upload-container-main" style="position: relative; background: {main_upload_bg}; padding: 2.5rem; border-radius: 15px; border: 3px dashed #667eea; margin: 1rem 0; text-align: center; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
+                    <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.2rem;">
+                        📎 Drag and drop files here or click to browse
+                    </p>
+                    <p style="margin: 0.5rem 0 0 0; color: {main_upload_info_text}; font-size: 0.9rem;">
+                        Limit 200MB per file • PDF, DOCX, DOC, TXT
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # File uploader positioned to overlay the dotted section
                 main_uploaded_files = st.file_uploader(
                     "Upload college documents (PDF, DOCX, or TXT)",
                     type=['pdf', 'docx', 'doc', 'txt'],
@@ -1144,15 +1185,6 @@ def main():
                     label_visibility="collapsed",
                     key="main_uploader"
                 )
-                # File type and size info below uploader
-                main_upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
-                st.markdown(f"""
-                <div style="text-align: center; margin-top: 0.5rem;">
-                    <p style="margin: 0; color: {main_upload_info_text}; font-size: 0.9rem;">
-                        📎 Limit 200MB per file • PDF, DOCX, DOC, TXT
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
                 
                 # Save button for main upload
                 if main_uploaded_files:
