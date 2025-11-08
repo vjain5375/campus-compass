@@ -1261,6 +1261,204 @@ def main():
         
         st.divider()
         
+        # Upload Documents Section in Sidebar - Dotted Section as Upload Interface
+        st.markdown("### 📤 Upload Documents")
+        sidebar_upload_bg = "rgba(102, 126, 234, 0.1)" if st.session_state.dark_mode else "#f0f4ff"
+        sidebar_upload_text = "#e0e0e0" if st.session_state.dark_mode else "#667eea"
+        sidebar_upload_info_text = "#b0b0b0" if st.session_state.dark_mode else "#666"
+        
+        # File uploader for sidebar - completely hidden
+        sidebar_uploaded_files = st.file_uploader(
+            "Upload college documents (PDF, DOCX, or TXT)",
+            type=['pdf', 'docx', 'doc', 'txt'],
+            accept_multiple_files=True,
+            help="Upload one or more documents. They will be added to your existing documents.",
+            label_visibility="collapsed",
+            key="sidebar_uploader"
+        )
+        
+        # Create clickable dotted area in sidebar
+        st.markdown(f"""
+        <div id="upload-wrapper-sidebar" style="position: relative; margin: 1rem 0;">
+            <div id="upload-container-sidebar" class="upload-button" style="position: relative; background: {sidebar_upload_bg}; padding: 2rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1; transition: all 0.3s ease;">
+                <div style="font-size: 3rem; margin-bottom: 1rem; display: block;">☁️</div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                    <p style="margin: 0; color: {sidebar_upload_text}; font-weight: 600; font-size: 1rem;">
+                        Drag and drop files here or click to browse
+                    </p>
+                    <p style="margin: 0; color: {sidebar_upload_info_text}; font-size: 0.85rem;">
+                        Limit 200MB per file • PDF, DOCX, DOC, TXT
+                    </p>
+                </div>
+            </div>
+        </div>
+        <script>
+            (function() {{
+                function setupSidebarUpload() {{
+                    const container = document.getElementById('upload-container-sidebar');
+                    const wrapper = document.getElementById('upload-wrapper-sidebar');
+                    if (!container || !wrapper) return;
+                    
+                    // Find the sidebar file uploader (first one or the one with key="sidebar_uploader")
+                    let uploader = document.querySelector('[data-testid="stFileUploader"]');
+                    if (!uploader) return;
+                    
+                    // Check if this is the sidebar uploader by checking its position or key
+                    // We'll use the first uploader we find for sidebar
+                    const allUploaders = document.querySelectorAll('[data-testid="stFileUploader"]');
+                    if (allUploaders.length > 1) {{
+                        // If multiple, use the first one (sidebar comes first in DOM)
+                        uploader = allUploaders[0];
+                    }}
+                    
+                    // Hide all default Streamlit uploader UI
+                    uploader.style.display = 'none';
+                    uploader.style.visibility = 'hidden';
+                    uploader.style.opacity = '0';
+                    uploader.style.height = '0';
+                    uploader.style.width = '0';
+                    uploader.style.position = 'absolute';
+                    uploader.style.pointerEvents = 'none';
+                    
+                    // Hide all children of uploader except input
+                    const uploaderChildren = uploader.querySelectorAll('*');
+                    uploaderChildren.forEach(child => {{
+                        if (child.tagName !== 'INPUT') {{
+                            child.style.display = 'none';
+                            child.style.visibility = 'hidden';
+                        }}
+                    }});
+                    
+                    // Find file input
+                    let fileInput = uploader.querySelector('input[type="file"]');
+                    if (!fileInput) {{
+                        fileInput = uploader.querySelector('input');
+                    }}
+                    
+                    if (fileInput) {{
+                        // Keep file input in uploader but make it cover the dotted area
+                        // Position uploader over the dotted area
+                        if (uploader.parentNode !== wrapper) {{
+                            uploader.style.position = 'absolute';
+                            uploader.style.top = '0';
+                            uploader.style.left = '0';
+                            uploader.style.width = '100%';
+                            uploader.style.height = '100%';
+                            uploader.style.opacity = '0';
+                            uploader.style.zIndex = '10';
+                            uploader.style.pointerEvents = 'none';
+                            wrapper.appendChild(uploader);
+                        }}
+                        
+                        // Style file input to cover the dotted area
+                        fileInput.style.position = 'absolute';
+                        fileInput.style.top = '0';
+                        fileInput.style.left = '0';
+                        fileInput.style.width = '100%';
+                        fileInput.style.height = '100%';
+                        fileInput.style.opacity = '0';
+                        fileInput.style.cursor = 'pointer';
+                        fileInput.style.zIndex = '999';
+                        fileInput.style.pointerEvents = 'auto';
+                        
+                        // Make container clickable
+                        container.onclick = function(e) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            fileInput.click();
+                        }};
+                        
+                        // Handle drag and drop
+                        container.ondragover = function(e) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            container.style.borderColor = '#818cf8';
+                        }};
+                        
+                        container.ondragleave = function(e) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            container.style.borderColor = '#667eea';
+                        }};
+                        
+                        container.ondrop = function(e) {{
+                            e.preventDefault();
+                            e.stopPropagation();
+                            container.style.borderColor = '#667eea';
+                            if (e.dataTransfer.files.length > 0) {{
+                                fileInput.files = e.dataTransfer.files;
+                                const event = new Event('change', {{ bubbles: true }});
+                                fileInput.dispatchEvent(event);
+                            }}
+                        }};
+                    }}
+                }}
+                
+                // Try multiple times
+                setupSidebarUpload();
+                setTimeout(setupSidebarUpload, 100);
+                setTimeout(setupSidebarUpload, 300);
+                setTimeout(setupSidebarUpload, 500);
+                setTimeout(setupSidebarUpload, 1000);
+                
+                if (document.readyState === 'loading') {{
+                    document.addEventListener('DOMContentLoaded', setupSidebarUpload);
+                }}
+                window.addEventListener('load', setupSidebarUpload);
+            }})();
+        </script>
+        """, unsafe_allow_html=True)
+        
+        # Save button for sidebar upload
+        if sidebar_uploaded_files:
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("💾 Save Uploaded Documents", type="primary", use_container_width=True, key="save_sidebar_uploaded_files"):
+                docs_dir = ensure_documents_directory()
+                
+                with st.spinner("Saving documents..."):
+                    saved_count = 0
+                    skipped_count = 0
+                    errors = []
+                    
+                    try:
+                        for uploaded_file in sidebar_uploaded_files:
+                            try:
+                                file_ext = Path(uploaded_file.name).suffix.lower()
+                                if file_ext not in ['.pdf', '.docx', '.doc', '.txt']:
+                                    errors.append(f"{uploaded_file.name}: Unsupported format")
+                                    skipped_count += 1
+                                    continue
+                                
+                                file_path = docs_dir / uploaded_file.name
+                                
+                                if file_path.exists():
+                                    skipped_count += 1
+                                    errors.append(f"{uploaded_file.name}: File already exists (skipped)")
+                                    continue
+                                
+                                with open(file_path, "wb") as f:
+                                    f.write(uploaded_file.getbuffer())
+                                saved_count += 1
+                                
+                            except Exception as e:
+                                errors.append(f"{uploaded_file.name}: {str(e)}")
+                                skipped_count += 1
+                        
+                        if saved_count > 0:
+                            st.success(f"✅ Saved {saved_count} document(s)!")
+                        if skipped_count > 0:
+                            for error in errors:
+                                st.warning(f"⚠️ {error}")
+                        
+                        if saved_count > 0:
+                            st.info("Click 'Process Documents' below to index the new documents.")
+                            st.session_state.documents_processed = False
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"Error saving documents: {str(e)}")
+        
+        st.divider()
+        
         # Show existing documents with attractive styling
         st.markdown("### 📁 Existing Documents")
         doc_files = get_document_files()
@@ -1477,8 +1675,16 @@ def main():
                             const wrapper = document.getElementById('upload-wrapper-main');
                             if (!container || !wrapper) return;
                             
-                            // Find the file uploader
-                            let uploader = document.querySelector('[data-testid="stFileUploader"]');
+                            // Find the main file uploader (second one, or the one with key="main_uploader")
+                            const allUploaders = document.querySelectorAll('[data-testid="stFileUploader"]');
+                            let uploader = null;
+                            if (allUploaders.length > 1) {{
+                                // Use the second one (main comes after sidebar in DOM)
+                                uploader = allUploaders[1];
+                            }} else if (allUploaders.length === 1) {{
+                                // Only one uploader, use it
+                                uploader = allUploaders[0];
+                            }}
                             if (!uploader) return;
                             
                             // Hide all default Streamlit uploader UI
@@ -1506,9 +1712,17 @@ def main():
                             }}
                             
                             if (fileInput) {{
-                                // Move file input into wrapper
-                                if (fileInput.parentNode !== wrapper) {{
-                                    wrapper.appendChild(fileInput);
+                                // Position uploader over the dotted area (keep it in DOM structure for Streamlit)
+                                if (uploader.parentNode !== wrapper) {{
+                                    uploader.style.position = 'absolute';
+                                    uploader.style.top = '0';
+                                    uploader.style.left = '0';
+                                    uploader.style.width = '100%';
+                                    uploader.style.height = '100%';
+                                    uploader.style.opacity = '0';
+                                    uploader.style.zIndex = '10';
+                                    uploader.style.pointerEvents = 'none';
+                                    wrapper.appendChild(uploader);
                                 }}
                                 
                                 // Style file input to cover the dotted area
