@@ -275,10 +275,15 @@ def get_theme_css(dark_mode):
                 color: #d0d0d0;
             }
             
-            /* Hide branding */
+            /* Hide branding but keep sidebar toggle visible */
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
-            header {visibility: hidden;}
+            /* Keep header visible for sidebar toggle */
+            header {visibility: visible !important;}
+            /* Ensure sidebar toggle button is visible */
+            button[title="View sidebar"] {visibility: visible !important; display: block !important;}
+            [data-testid="collapsedControl"] {visibility: visible !important; display: block !important;}
+            [data-testid="stSidebarCollapseButton"] {visibility: visible !important; display: block !important;}
             
             /* Scrollbar */
             ::-webkit-scrollbar {
@@ -457,10 +462,15 @@ def get_theme_css(dark_mode):
                 box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             }
             
-            /* Hide branding */
+            /* Hide branding but keep sidebar toggle visible */
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
-            header {visibility: hidden;}
+            /* Keep header visible for sidebar toggle */
+            header {visibility: visible !important;}
+            /* Ensure sidebar toggle button is visible */
+            button[title="View sidebar"] {visibility: visible !important; display: block !important;}
+            [data-testid="collapsedControl"] {visibility: visible !important; display: block !important;}
+            [data-testid="stSidebarCollapseButton"] {visibility: visible !important; display: block !important;}
         </style>
         """
 
