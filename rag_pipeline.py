@@ -134,7 +134,7 @@ Please provide a helpful answer based on the context above."""
         
         return system_prompt, user_prompt
     
-    def answer_question(self, question: str, n_chunks: int = 5, summarize: bool = False, allow_general: bool = True) -> Dict:
+    def answer_question(self, question: str, n_chunks: int = 5, summarize: bool = False, allow_general: bool = True, prioritize_source: Optional[str] = None) -> Dict:
         """
         Answer a question using RAG
         
@@ -143,12 +143,13 @@ Please provide a helpful answer based on the context above."""
             n_chunks: Number of chunks to retrieve
             summarize: Whether to provide a summary format
             allow_general: Whether to allow general answers when documents don't have info
+            prioritize_source: If provided, prioritize chunks from this source (filename)
             
         Returns:
             Dict with 'answer', 'sources', and 'chunks' keys
         """
-        # Retrieve relevant chunks
-        retrieved_chunks = self.vector_store.search(question, n_results=n_chunks)
+        # Retrieve relevant chunks (prioritize latest document if specified)
+        retrieved_chunks = self.vector_store.search(question, n_results=n_chunks, prioritize_source=prioritize_source)
         
         # Format context (even if empty, we'll handle it)
         if retrieved_chunks:

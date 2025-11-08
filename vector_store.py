@@ -8,6 +8,7 @@ import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from typing import List, Dict, Optional
+from pathlib import Path
 import hashlib
 
 
@@ -75,13 +76,14 @@ class VectorStore:
         
         print(f"Added {len(texts)} chunks to vector store")
     
-    def search(self, query: str, n_results: int = 5) -> List[Dict]:
+    def search(self, query: str, n_results: int = 5, prioritize_source: Optional[str] = None) -> List[Dict]:
         """
         Search for similar chunks
         
         Args:
             query: Search query
             n_results: Number of results to return
+            prioritize_source: If provided, prioritize chunks from this source (filename)
             
         Returns:
             List of dicts with 'text', 'metadata', and 'distance' keys
@@ -89,10 +91,12 @@ class VectorStore:
         # Generate query embedding
         query_embedding = self.embedding_model.encode([query])[0]
         
-        # Search in ChromaDB
+        # Search in ChromaDB - retrieve more results if we need to prioritize
+        search_n = n_results * 2 if prioritize_source else n_results
+        
         results = self.collection.query(
             query_embeddings=[query_embedding.tolist()],
-            n_results=n_results
+            n_results=search_n
         )
         
         # Format results
@@ -104,6 +108,22 @@ class VectorStore:
                     'metadata': results['metadatas'][0][i],
                     'distance': results['distances'][0][i] if 'distances' in results else None
                 })
+        
+        # If prioritizing a source, reorder to put that source first
+        if prioritize_source and formatted_results:
+            prioritized = []
+            others = []
+            source_name = Path(prioritize_source).name if prioritize_source else None
+            
+            for chunk in formatted_results:
+                chunk_source = chunk['metadata'].get('source', '')
+                if source_name and chunk_source == source_name:
+                    prioritized.append(chunk)
+                else:
+                    others.append(chunk)
+            
+            # Combine: prioritized chunks first, then others, limit to n_results
+            formatted_results = (prioritized + others)[:n_results]
         
         return formatted_results
     

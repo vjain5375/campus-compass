@@ -11,7 +11,7 @@ from document_processor import DocumentProcessor
 from vector_store import VectorStore
 from rag_pipeline import RAGPipeline
 from alerts_manager import AlertsManager
-from utils import ensure_documents_directory, get_document_files, format_sources
+from utils import ensure_documents_directory, get_document_files, format_sources, get_latest_document, detect_multi_document_intent
 
 # Load .env file at the start - try multiple methods
 def load_api_key():
@@ -502,14 +502,26 @@ def main():
             return
         
         with st.spinner("Searching documents and generating answer..."):
-            # Select appropriate method based on mode (allow_general=True by default)
-            # Increase n_chunks to ensure we get information from all documents
-            if question_mode == "Multi-Document":
+            # Auto-detect multi-document intent from question
+            auto_multi_doc = detect_multi_document_intent(question)
+            
+            # Select appropriate method based on mode or auto-detection
+            if question_mode == "Multi-Document" or auto_multi_doc:
+                # Use multi-document mode if explicitly selected or auto-detected
+                if auto_multi_doc and question_mode != "Multi-Document":
+                    st.info("💡 Detected multi-document intent - using multi-document synthesis")
                 result = st.session_state.rag_pipeline.answer_multi_document_question(question, n_chunks=12, allow_general=True)
             elif question_mode == "Summarize":
                 result = st.session_state.rag_pipeline.answer_question(question, n_chunks=10, summarize=True, allow_general=True)
             else:
-                result = st.session_state.rag_pipeline.answer_question(question, n_chunks=10, allow_general=True)
+                # Standard mode: prioritize latest uploaded document
+                latest_doc = get_latest_document()
+                result = st.session_state.rag_pipeline.answer_question(
+                    question, 
+                    n_chunks=10, 
+                    allow_general=True,
+                    prioritize_source=latest_doc
+                )
             
             # Display answer
             st.markdown("### 💡 Answer")
