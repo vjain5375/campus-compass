@@ -20,12 +20,21 @@ def get_document_files() -> List[str]:
     docs_dir = ensure_documents_directory()
     supported_extensions = ['.pdf', '.docx', '.doc', '.txt']
     
+    # Use rglob to recursively find all files, then filter by extension
+    # This avoids duplicates that would occur with both *{ext} and **/*{ext}
+    all_files = list(docs_dir.rglob('*'))
     files = []
-    for ext in supported_extensions:
-        files.extend(list(docs_dir.glob(f"*{ext}")))
-        files.extend(list(docs_dir.glob(f"**/*{ext}")))
+    seen_paths = set()  # Track seen files to avoid duplicates
     
-    return [str(f) for f in files if f.is_file()]
+    for file_path in all_files:
+        if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
+            # Normalize path to avoid duplicates (e.g., Windows path issues)
+            normalized_path = str(file_path.resolve())
+            if normalized_path not in seen_paths:
+                seen_paths.add(normalized_path)
+                files.append(str(file_path))
+    
+    return files
 
 
 def format_sources(sources: List[str]) -> str:
