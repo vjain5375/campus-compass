@@ -705,58 +705,60 @@ def main():
                 help="Upload one or more documents. They will be added to your existing documents.",
                 label_visibility="collapsed"
             )
-        
-        if uploaded_files:
-            if st.button("💾 Save Uploaded Documents", type="primary", use_container_width=True):
-                docs_dir = ensure_documents_directory()
-                
-                with st.spinner("Saving documents..."):
-                    saved_count = 0
-                    skipped_count = 0
-                    errors = []
+            
+            # Save button inside expander
+            if uploaded_files:
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("💾 Save Uploaded Documents", type="primary", use_container_width=True, key="save_uploaded_files"):
+                    docs_dir = ensure_documents_directory()
                     
-                    try:
-                        for uploaded_file in uploaded_files:
-                            try:
-                                # Determine file extension
-                                file_ext = Path(uploaded_file.name).suffix.lower()
-                                if file_ext not in ['.pdf', '.docx', '.doc', '.txt']:
-                                    errors.append(f"{uploaded_file.name}: Unsupported format")
-                                    skipped_count += 1
-                                    continue
-                                
-                                # Get target file path
-                                file_path = docs_dir / uploaded_file.name
-                                
-                                # If file with same name exists, skip it (don't overwrite)
-                                if file_path.exists():
-                                    skipped_count += 1
-                                    errors.append(f"{uploaded_file.name}: File already exists (skipped)")
-                                    continue
-                                
-                                # Save new file
-                                with open(file_path, "wb") as f:
-                                    f.write(uploaded_file.getbuffer())
-                                saved_count += 1
-                                
-                            except Exception as e:
-                                errors.append(f"{uploaded_file.name}: {str(e)}")
-                                skipped_count += 1
+                    with st.spinner("Saving documents..."):
+                        saved_count = 0
+                        skipped_count = 0
+                        errors = []
                         
-                        # Show results
-                        if saved_count > 0:
-                            st.success(f"✅ Saved {saved_count} document(s)!")
-                        if skipped_count > 0:
-                            for error in errors:
-                                st.warning(f"⚠️ {error}")
-                        
-                        if saved_count > 0:
-                            st.info("Click 'Process Documents' below to index the new documents.")
-                            # Don't clear vector store - just mark that reprocessing is needed
-                            st.session_state.documents_processed = False
-                            st.rerun()
-                    except Exception as e:
-                        st.error(f"Error saving documents: {str(e)}")
+                        try:
+                            for uploaded_file in uploaded_files:
+                                try:
+                                    # Determine file extension
+                                    file_ext = Path(uploaded_file.name).suffix.lower()
+                                    if file_ext not in ['.pdf', '.docx', '.doc', '.txt']:
+                                        errors.append(f"{uploaded_file.name}: Unsupported format")
+                                        skipped_count += 1
+                                        continue
+                                    
+                                    # Get target file path
+                                    file_path = docs_dir / uploaded_file.name
+                                    
+                                    # If file with same name exists, skip it (don't overwrite)
+                                    if file_path.exists():
+                                        skipped_count += 1
+                                        errors.append(f"{uploaded_file.name}: File already exists (skipped)")
+                                        continue
+                                    
+                                    # Save new file
+                                    with open(file_path, "wb") as f:
+                                        f.write(uploaded_file.getbuffer())
+                                    saved_count += 1
+                                    
+                                except Exception as e:
+                                    errors.append(f"{uploaded_file.name}: {str(e)}")
+                                    skipped_count += 1
+                            
+                            # Show results
+                            if saved_count > 0:
+                                st.success(f"✅ Saved {saved_count} document(s)!")
+                            if skipped_count > 0:
+                                for error in errors:
+                                    st.warning(f"⚠️ {error}")
+                            
+                            if saved_count > 0:
+                                st.info("Click 'Process Documents' below to index the new documents.")
+                                # Don't clear vector store - just mark that reprocessing is needed
+                                st.session_state.documents_processed = False
+                                st.rerun()
+                        except Exception as e:
+                            st.error(f"Error saving documents: {str(e)}")
         
         st.divider()
         
