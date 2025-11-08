@@ -1567,13 +1567,17 @@ def main():
                 <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
                     <div id="upload-wrapper-main" style="position: relative; max-width: 800px; width: 100%;">
                         <div id="upload-container-main" class="upload-button" style="position: relative; background: {main_upload_bg}; padding: 4rem 3rem; border-radius: 15px; border: 3px dashed #667eea; text-align: center; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; z-index: 1; transition: all 0.3s ease;">
-                            <div style="font-size: 4rem; margin-bottom: 1.5rem;">☁️</div>
-                            <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.3rem;">
-                                Drag and drop files here or click to browse
-                            </p>
-                            <p style="margin: 1rem 0 0 0; color: {main_upload_info_text}; font-size: 1rem;">
-                                Limit 200MB per file • PDF, DOCX, DOC, TXT
-                            </p>
+                            <!-- Cloud Icon at Top -->
+                            <div style="font-size: 4rem; margin-bottom: 2rem; display: block;">☁️</div>
+                            <!-- Upload Text Below Cloud -->
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.8rem;">
+                                <p style="margin: 0; color: {main_upload_text}; font-weight: 700; font-size: 1.3rem;">
+                                    Drag and drop files here or click to browse
+                                </p>
+                                <p style="margin: 0; color: {main_upload_info_text}; font-size: 1rem;">
+                                    Limit 200MB per file • PDF, DOCX, DOC, TXT
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
