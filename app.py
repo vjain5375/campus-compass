@@ -501,24 +501,65 @@ def get_theme_css(dark_mode):
                 box-shadow: 4px 0 25px rgba(102, 126, 234, 0.25);
             }
             
-            /* Theme Toggle Button - Enhanced Visibility */
+            /* Theme Toggle Button - Dark and Visible in Light Mode */
             [data-testid="stToggle"] {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
                 border-radius: 12px !important;
                 padding: 0.5rem !important;
-                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
-                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 4px 15px rgba(30, 41, 59, 0.4) !important;
+                border: 2px solid #334155 !important;
+                visibility: visible !important;
+                display: block !important;
+                opacity: 1 !important;
+                width: 100% !important;
+                min-height: 50px !important;
             }
             
             [data-testid="stToggle"] > label {
-                color: white !important;
+                color: #ffffff !important;
                 font-weight: 700 !important;
                 font-size: 1.1rem !important;
+                visibility: visible !important;
+                display: block !important;
+                opacity: 1 !important;
+            }
+            
+            /* Toggle switch itself */
+            [data-testid="stToggle"] > div {
+                visibility: visible !important;
+                display: block !important;
+                opacity: 1 !important;
+            }
+            
+            [data-testid="stToggle"] button,
+            [data-testid="stToggle"] > div > button,
+            [data-testid="stToggle"] > div > div > button {
+                visibility: visible !important;
+                display: block !important;
+                opacity: 1 !important;
+                background: #334155 !important;
+                border: 2px solid #475569 !important;
+                color: #ffffff !important;
+                min-width: 40px !important;
+                min-height: 24px !important;
+            }
+            
+            /* Ensure toggle container is visible */
+            [data-testid="stToggle"] * {
+                visibility: visible !important;
+            }
+            
+            /* Toggle switch track */
+            [data-testid="stToggle"] > div > div {
+                visibility: visible !important;
+                display: block !important;
+                opacity: 1 !important;
             }
             
             [data-testid="stToggle"]:hover {
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
+                box-shadow: 0 6px 20px rgba(30, 41, 59, 0.6) !important;
                 transform: translateY(-2px) !important;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
             }
             
             /* Sidebar Toggle Button - Enhanced Visibility */
@@ -825,14 +866,18 @@ def main():
             st.session_state.dark_mode = dark_mode
             st.rerun()
         
-        # Theme indicator with attractive styling
-        theme_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if dark_mode else "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)"
-        theme_text = "white"
+        # Theme indicator with attractive styling - Dark in light mode
+        if dark_mode:
+            theme_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            theme_text = "white"
+        else:
+            theme_bg = "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"
+            theme_text = "#ffffff"
         theme_icon = "🌙" if dark_mode else "☀️"
         theme_label = "Dark Mode" if dark_mode else "Light Mode"
         
         st.markdown(f"""
-        <div style="text-align: center; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; background: {theme_bg}; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <div style="text-align: center; padding: 1rem; margin-bottom: 1rem; border-radius: 12px; background: {theme_bg}; box-shadow: 0 4px 15px rgba(30, 41, 59, 0.4); border: 2px solid #334155;">
             <p style="margin: 0; color: {theme_text}; font-weight: 700; font-size: 1.1rem;">
                 {theme_icon} {theme_label}
             </p>
