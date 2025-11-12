@@ -83,6 +83,27 @@ st.set_page_config(
 load_api_key()
 
 # Initialize session state
+if 'session_initialized' not in st.session_state:
+    # Clear documents on new session/refresh
+    st.session_state.session_initialized = True
+    docs_dir = ensure_documents_directory()
+    doc_files = get_document_files()
+    for doc_path in doc_files:
+        try:
+            Path(doc_path).unlink()
+        except Exception:
+            pass
+    # Clear vector store
+    try:
+        temp_vs = VectorStore()
+        temp_vs.clear_collection()
+    except Exception:
+        pass
+    st.session_state.documents_processed = False
+    st.session_state.uploaded_files_shared = None
+    st.session_state.latest_document = None
+    st.session_state.document_upload_order = []  # Track upload order
+
 if 'agent_controller' not in st.session_state:
     st.session_state.agent_controller = None
 if 'vector_store' not in st.session_state:
@@ -99,6 +120,12 @@ if 'quiz_answers' not in st.session_state:
     st.session_state.quiz_answers = {}
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
+if 'uploaded_files_shared' not in st.session_state:
+    st.session_state.uploaded_files_shared = None
+if 'latest_document' not in st.session_state:
+    st.session_state.latest_document = None
+if 'document_upload_order' not in st.session_state:
+    st.session_state.document_upload_order = []
 
 # Load CSS (simplified version - can be expanded)
 st.markdown("""
@@ -140,12 +167,23 @@ def process_documents():
         st.error("No documents found. Please upload PDF, DOCX, or TXT files.")
         return False
     
+    # Update latest document based on upload order (most recent is last)
+    if st.session_state.document_upload_order:
+        st.session_state.latest_document = st.session_state.document_upload_order[-1]
+    else:
+        # Fallback: use most recently modified file
+        doc_files_with_time = [(Path(doc).stat().st_mtime, doc) for doc in doc_files if Path(doc).exists()]
+        if doc_files_with_time:
+            doc_files_with_time.sort(reverse=True)
+            st.session_state.latest_document = Path(doc_files_with_time[0][1]).name
+    
     with st.spinner("Processing documents with Reader Agent..."):
         result = st.session_state.agent_controller.process_study_materials(str(docs_dir))
         
         if result['total_chunks'] > 0:
             st.session_state.documents_processed = True
-            st.success(f"✅ Processed {result['total_chunks']} chunks from {result['total_topics']} topics!")
+            latest_info = f" (Latest: {st.session_state.latest_document})" if st.session_state.latest_document else ""
+            st.success(f"✅ Processed {result['total_chunks']} chunks from {result['total_topics']} topics!{latest_info}")
             return True
         else:
             st.error("No content could be extracted from documents.")
@@ -237,13 +275,26 @@ def main():
             with col1:
                 if st.button("💾 Save", use_container_width=True, key="sidebar_save"):
                     saved = 0
+                    saved_files = []
                     for uploaded_file in files_to_process_sidebar:
                         file_path = docs_dir / uploaded_file.name
                         if not file_path.exists():
                             with open(file_path, "wb") as f:
                                 f.write(uploaded_file.getbuffer())
                             saved += 1
+                            saved_files.append(uploaded_file.name)
+                            # Track upload order
+                            if uploaded_file.name not in st.session_state.document_upload_order:
+                                st.session_state.document_upload_order.append(uploaded_file.name)
+                            else:
+                                # Move to end if already exists (re-upload)
+                                st.session_state.document_upload_order.remove(uploaded_file.name)
+                                st.session_state.document_upload_order.append(uploaded_file.name)
+                    
                     if saved > 0:
+                        # Update latest document
+                        if saved_files:
+                            st.session_state.latest_document = saved_files[-1]
                         st.success(f"✅ Saved {saved} file(s)!")
                         st.session_state.documents_processed = False
                         st.session_state.uploaded_files_shared = None  # Clear after saving
@@ -253,11 +304,25 @@ def main():
             with col2:
                 if st.button("🔄 Process", use_container_width=True, type="primary", key="sidebar_process"):
                     # Save first if needed
+                    saved_files = []
                     for uploaded_file in files_to_process_sidebar:
                         file_path = docs_dir / uploaded_file.name
                         if not file_path.exists():
                             with open(file_path, "wb") as f:
                                 f.write(uploaded_file.getbuffer())
+                            saved_files.append(uploaded_file.name)
+                            # Track upload order
+                            if uploaded_file.name not in st.session_state.document_upload_order:
+                                st.session_state.document_upload_order.append(uploaded_file.name)
+                            else:
+                                # Move to end if already exists (re-upload)
+                                st.session_state.document_upload_order.remove(uploaded_file.name)
+                                st.session_state.document_upload_order.append(uploaded_file.name)
+                    
+                    # Update latest document before processing
+                    if saved_files:
+                        st.session_state.latest_document = saved_files[-1]
+                    
                     if process_documents():
                         st.session_state.uploaded_files_shared = None  # Clear after processing
                         st.balloons()
@@ -358,13 +423,26 @@ def show_home_page():
             if st.button("💾 Save Files", use_container_width=True, type="primary", key="save_main_files"):
                 docs_dir = ensure_documents_directory()
                 saved = 0
+                saved_files = []
                 for uploaded_file in files_to_process:
                     file_path = docs_dir / uploaded_file.name
                     if not file_path.exists():
                         with open(file_path, "wb") as f:
                             f.write(uploaded_file.getbuffer())
                         saved += 1
+                        saved_files.append(uploaded_file.name)
+                        # Track upload order
+                        if uploaded_file.name not in st.session_state.document_upload_order:
+                            st.session_state.document_upload_order.append(uploaded_file.name)
+                        else:
+                            # Move to end if already exists (re-upload)
+                            st.session_state.document_upload_order.remove(uploaded_file.name)
+                            st.session_state.document_upload_order.append(uploaded_file.name)
+                
                 if saved > 0:
+                    # Update latest document
+                    if saved_files:
+                        st.session_state.latest_document = saved_files[-1]  # Most recently saved
                     st.success(f"✅ Saved {saved} document(s)!")
                     st.session_state.documents_processed = False
                     st.session_state.uploaded_files_shared = None  # Clear after saving
@@ -376,11 +454,24 @@ def show_home_page():
             if st.button("🔄 Process & Index", use_container_width=True, type="primary", key="process_main_files"):
                 # First save files if not saved
                 docs_dir = ensure_documents_directory()
+                saved_files = []
                 for uploaded_file in files_to_process:
                     file_path = docs_dir / uploaded_file.name
                     if not file_path.exists():
                         with open(file_path, "wb") as f:
                             f.write(uploaded_file.getbuffer())
+                        saved_files.append(uploaded_file.name)
+                        # Track upload order
+                        if uploaded_file.name not in st.session_state.document_upload_order:
+                            st.session_state.document_upload_order.append(uploaded_file.name)
+                        else:
+                            # Move to end if already exists (re-upload)
+                            st.session_state.document_upload_order.remove(uploaded_file.name)
+                            st.session_state.document_upload_order.append(uploaded_file.name)
+                
+                # Update latest document before processing
+                if saved_files:
+                    st.session_state.latest_document = saved_files[-1]
                 
                 # Then process
                 if process_documents():
@@ -642,6 +733,10 @@ def show_chat_page():
         st.warning("Please process documents first!")
         return
     
+    # Show latest document info
+    if st.session_state.latest_document:
+        st.info(f"📄 Prioritizing: **{st.session_state.latest_document}** (most recently uploaded)")
+    
     # Chat history
     for i, (question, answer) in enumerate(st.session_state.chat_history):
         st.markdown(f"**Q:** {question}")
@@ -653,7 +748,9 @@ def show_chat_page():
     if st.button("🔍 Ask", type="primary"):
         if question:
             with st.spinner("Thinking..."):
-                result = st.session_state.agent_controller.answer_question(question)
+                # Use latest document for prioritization
+                latest_doc = st.session_state.latest_document if st.session_state.latest_document else None
+                result = st.session_state.agent_controller.answer_question(question, prioritize_source=latest_doc)
                 st.session_state.chat_history.append((question, result['answer']))
                 st.rerun()
 

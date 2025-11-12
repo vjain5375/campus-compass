@@ -28,13 +28,14 @@ class ChatAgent:
         else:
             self.llm = None
     
-    def answer_question(self, question: str, n_chunks: int = 5) -> Dict:
+    def answer_question(self, question: str, n_chunks: int = 5, prioritize_source: Optional[str] = None) -> Dict:
         """
         Answer a question using RAG from study materials
         
         Args:
             question: User's question
             n_chunks: Number of relevant chunks to retrieve
+            prioritize_source: Optional filename to prioritize in search
             
         Returns:
             Dict with 'answer', 'sources', and 'chunks' keys
@@ -46,8 +47,8 @@ class ChatAgent:
                 'chunks': []
             }
         
-        # Retrieve relevant chunks
-        retrieved_chunks = self.vector_store.search(question, n_results=n_chunks)
+        # Retrieve relevant chunks (prioritize latest document if specified)
+        retrieved_chunks = self.vector_store.search(question, n_results=n_chunks, prioritize_source=prioritize_source)
         
         # Filter by relevance
         relevant_chunks = []

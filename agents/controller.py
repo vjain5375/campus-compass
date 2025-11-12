@@ -220,17 +220,18 @@ class AgentController:
         
         return plan
     
-    def answer_question(self, question: str) -> Dict:
+    def answer_question(self, question: str, prioritize_source: Optional[str] = None) -> Dict:
         """
         Answer a question using Chat Agent
         
         Args:
             question: User's question
+            prioritize_source: Optional filename to prioritize in search
             
         Returns:
             Dict with answer, sources, and chunks
         """
-        return self.chat_agent.answer_question(question)
+        return self.chat_agent.answer_question(question, prioritize_source=prioritize_source)
     
     def evaluate_quiz(self, questions: List[Dict], user_answers: Dict[int, int]) -> Dict:
         """
