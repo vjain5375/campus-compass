@@ -35,3 +35,7 @@ Thumbs.db
 # Alerts data
 alerts.json
 
+# Generated outputs
+outputs/*.json
+outputs/*.txt
+
