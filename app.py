@@ -164,15 +164,35 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Sidebar Navigation
+    # Sidebar Navigation - Made more prominent
     with st.sidebar:
-        st.markdown("### 🎯 Navigation")
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem; text-align: center;">
+            <h2 style="color: white; margin: 0; font-size: 1.5rem;">🎯 Navigation</h2>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Make navigation buttons more visible
+        nav_options = {
+            "Home": "🏠",
+            "Flashcards": "📇",
+            "Quizzes": "📝",
+            "Revision Planner": "📅",
+            "Chat Assistant": "💬",
+            "Analytics": "📊"
+        }
+        
         page = st.radio(
             "Select Page",
-            ["Home", "Flashcards", "Quizzes", "Revision Planner", "Chat Assistant", "Analytics"],
-            key="page_selector"
+            list(nav_options.keys()),
+            format_func=lambda x: f"{nav_options[x]} {x}",
+            key="page_selector",
+            index=0 if st.session_state.current_page not in nav_options else list(nav_options.keys()).index(st.session_state.current_page)
         )
         st.session_state.current_page = page
+        
+        st.markdown("---")
+        st.markdown("**💡 Tip:** Use the buttons above to quickly access Flashcards and Quizzes!")
         
         st.divider()
         
@@ -232,27 +252,57 @@ def show_home_page():
         st.info("👆 Upload and process documents in the sidebar to get started!")
         return
     
-    # Feature cards
+    # Quick Access Buttons - Make Flashcards and Quizzes more prominent
+    st.markdown("### 🚀 Quick Access")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        if st.button("📇 **Flashcards**\n\nGenerate Q/A Cards", use_container_width=True, type="primary", key="quick_flashcards"):
+            st.session_state.current_page = "Flashcards"
+            st.rerun()
+    
+    with col2:
+        if st.button("📝 **Quizzes**\n\nTake Practice Tests", use_container_width=True, type="primary", key="quick_quizzes"):
+            st.session_state.current_page = "Quizzes"
+            st.rerun()
+    
+    with col3:
+        if st.button("📅 **Planner**\n\nRevision Schedule", use_container_width=True, type="primary", key="quick_planner"):
+            st.session_state.current_page = "Revision Planner"
+            st.rerun()
+    
+    with col4:
+        if st.button("💬 **Chat**\n\nAsk Questions", use_container_width=True, type="primary", key="quick_chat"):
+            st.session_state.current_page = "Chat Assistant"
+            st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Feature cards with more details
+    st.markdown("### ✨ Features")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.3);">
-            <h3 style="color: #667eea;">📇 Flashcards</h3>
-            <p style="color: #b0b0b0;">Auto-generated Q/A pairs for quick revision</p>
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.3); cursor: pointer;" onclick="window.location.href='#flashcards'">
+            <h3 style="color: #667eea; margin: 0;">📇 Flashcards</h3>
+            <p style="color: #b0b0b0; margin-top: 0.5rem;">Auto-generated Q/A pairs for quick revision</p>
+            <p style="color: #667eea; font-size: 0.9rem; margin-top: 1rem;">👉 Click "Flashcards" in sidebar to start</p>
         </div>
         """, unsafe_allow_html=True)
     with col2:
         st.markdown("""
         <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.3);">
-            <h3 style="color: #667eea;">📝 Quizzes</h3>
-            <p style="color: #b0b0b0;">Adaptive quizzes with multiple difficulty levels</p>
+            <h3 style="color: #667eea; margin: 0;">📝 Quizzes</h3>
+            <p style="color: #b0b0b0; margin-top: 0.5rem;">Adaptive quizzes with multiple difficulty levels</p>
+            <p style="color: #667eea; font-size: 0.9rem; margin-top: 1rem;">👉 Click "Quizzes" in sidebar to start</p>
         </div>
         """, unsafe_allow_html=True)
     with col3:
         st.markdown("""
         <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.3);">
-            <h3 style="color: #667eea;">📅 Planner</h3>
-            <p style="color: #b0b0b0;">Smart revision schedules based on your progress</p>
+            <h3 style="color: #667eea; margin: 0;">📅 Planner</h3>
+            <p style="color: #b0b0b0; margin-top: 0.5rem;">Smart revision schedules based on your progress</p>
+            <p style="color: #667eea; font-size: 0.9rem; margin-top: 1rem;">👉 Click "Revision Planner" in sidebar</p>
         </div>
         """, unsafe_allow_html=True)
     
