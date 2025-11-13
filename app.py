@@ -372,6 +372,10 @@ def main():
                     if process_documents():
                         st.session_state.uploaded_files_shared = None  # Clear after processing
                         st.balloons()
+                        # Show summary in sidebar
+                        if 'processing_results' in st.session_state:
+                            result = st.session_state.processing_results
+                            st.success(f"✅ {result['total_chunks']} chunks, {result['total_topics']} topics!")
                         st.rerun()
         
         doc_files = get_document_files()
@@ -381,6 +385,10 @@ def main():
         if st.button("🔄 Process Documents", use_container_width=True, type="primary"):
             if process_documents():
                 st.balloons()
+                # Show summary in sidebar
+                if 'processing_results' in st.session_state:
+                    result = st.session_state.processing_results
+                    st.success(f"✅ {result['total_chunks']} chunks, {result['total_topics']} topics extracted!")
         
         if st.session_state.vector_store:
             count = st.session_state.vector_store.get_collection_count()
