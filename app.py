@@ -188,6 +188,9 @@ def process_documents():
             # Store processing results for display
             st.session_state.processing_results = result
             
+            # Celebration effect - Balloons animation
+            st.balloons()
+            
             return True
         else:
             st.error("No content could be extracted from documents.")
