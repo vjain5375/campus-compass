@@ -382,6 +382,29 @@ def main():
             count = st.session_state.vector_store.get_collection_count()
             st.metric("Indexed Chunks", count)
     
+    # Navigation Buttons - Always visible in main section
+    st.markdown("### 🎯 Navigation")
+    nav_options = {
+        "Home": "🏠",
+        "Flashcards": "📇",
+        "Quizzes": "📝",
+        "Revision Planner": "📅",
+        "Chat Assistant": "💬",
+        "Analytics": "📊"
+    }
+    
+    # Create navigation buttons in a grid - Always visible
+    nav_cols = st.columns(6)
+    for idx, (page_name, icon) in enumerate(nav_options.items()):
+        with nav_cols[idx]:
+            button_type = "primary" if st.session_state.current_page == page_name else "secondary"
+            nav_button = st.button(f"{icon}\n{page_name}", use_container_width=True, key=f"main_nav_{page_name}", type=button_type)
+            if nav_button:
+                st.session_state.current_page = page_name
+                st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     # Main Content Area
     if st.session_state.current_page == "Home":
         show_home_page()
@@ -440,32 +463,6 @@ def show_home_page():
         
         **💡 Pro Tip:** The most recently uploaded document gets priority in searches!
         """)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Navigation Buttons on Main Page - Synced with Sidebar
-    st.markdown("### 🎯 Navigation")
-    nav_options = {
-        "Home": "🏠",
-        "Flashcards": "📇",
-        "Quizzes": "📝",
-        "Revision Planner": "📅",
-        "Chat Assistant": "💬",
-        "Analytics": "📊"
-    }
-    
-    # Create navigation buttons in a grid
-    nav_cols = st.columns(6)
-    for idx, (page_name, icon) in enumerate(nav_options.items()):
-        with nav_cols[idx]:
-            button_type = "primary" if st.session_state.current_page == page_name else "secondary"
-            nav_button = st.button(f"{icon}\n{page_name}", use_container_width=True, key=f"main_nav_{page_name}", type=button_type)
-            if nav_button:
-                st.session_state.current_page = page_name
-                # Force rerun to update both main and sidebar
-                st.rerun()
-    
-    st.markdown("<br>", unsafe_allow_html=True)
     
     # Upload Section in Main Dashboard - More UI Friendly
     st.markdown("---")
