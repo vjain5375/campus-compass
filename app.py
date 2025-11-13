@@ -672,26 +672,22 @@ def show_home_page():
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        quick_flashcards = st.button("📇 **Flashcards**\n\nGenerate Q/A Cards", use_container_width=True, type="primary", key="quick_flashcards")
-        if quick_flashcards:
+        if st.button("📇 **Flashcards**\n\nGenerate Q/A Cards", use_container_width=True, type="primary", key="quick_flashcards_home"):
             st.session_state.current_page = "Flashcards"
             st.rerun()
     
     with col2:
-        quick_quizzes = st.button("📝 **Quizzes**\n\nTake Practice Tests", use_container_width=True, type="primary", key="quick_quizzes")
-        if quick_quizzes:
+        if st.button("📝 **Quizzes**\n\nTake Practice Tests", use_container_width=True, type="primary", key="quick_quizzes_home"):
             st.session_state.current_page = "Quizzes"
             st.rerun()
     
     with col3:
-        quick_planner = st.button("📅 **Planner**\n\nRevision Schedule", use_container_width=True, type="primary", key="quick_planner")
-        if quick_planner:
+        if st.button("📅 **Planner**\n\nRevision Schedule", use_container_width=True, type="primary", key="quick_planner_home"):
             st.session_state.current_page = "Revision Planner"
             st.rerun()
     
     with col4:
-        quick_chat = st.button("💬 **Chat**\n\nAsk Questions", use_container_width=True, type="primary", key="quick_chat")
-        if quick_chat:
+        if st.button("💬 **Chat**\n\nAsk Questions", use_container_width=True, type="primary", key="quick_chat_home"):
             st.session_state.current_page = "Chat Assistant"
             st.rerun()
     
