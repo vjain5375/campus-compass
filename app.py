@@ -5,11 +5,17 @@ Personalized study assistant with flashcards, quizzes, and revision planning
 
 import streamlit as st
 import os
+import logging
+import traceback
 from pathlib import Path
 from dotenv import load_dotenv
 from vector_store import VectorStore
 from agents.controller import AgentController
 from utils import ensure_documents_directory, get_document_files
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load .env file
 def load_api_key():
@@ -93,11 +99,12 @@ if 'session_initialized' not in st.session_state:
             Path(doc_path).unlink()
         except Exception:
             pass
-    # Clear vector store
+    # Clear vector store (only if it can be initialized)
     try:
         temp_vs = VectorStore()
         temp_vs.clear_collection()
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Could not clear vector store on session init: {e}")
         pass
     st.session_state.documents_processed = False
     st.session_state.uploaded_files_shared = None
@@ -150,19 +157,52 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def initialize_components():
-    """Initialize vector store and agent controller"""
+    """Initialize vector store and agent controller with robust error handling"""
     api_key = load_api_key()
     
     if st.session_state.vector_store is None:
         with st.spinner("Initializing vector store..."):
-            st.session_state.vector_store = VectorStore()
+            try:
+                st.session_state.vector_store = VectorStore()
+                # Log successful initialization
+                backend = st.session_state.vector_store.embedding_backend
+                st.success(f"✅ Vector store initialized using {backend} backend")
+            except Exception as e:
+                tb = traceback.format_exc()
+                logger.exception("VectorStore init failed: %s", tb)
+                
+                # Show user-friendly error message
+                st.error("""
+                ⚠️ **Failed to initialize vector store / embeddings**
+                
+                **Possible solutions:**
+                1. Set `EMBEDDING_BACKEND=api` in your environment variables and provide API keys:
+                   - `OPENAI_API_KEY` for OpenAI embeddings, or
+                   - `GOOGLE_API_KEY` for Gemini (if supported)
+                
+                2. For local embeddings, ensure `torch>=2.0.0` is installed:
+                   ```bash
+                   pip install torch --index-url https://download.pytorch.org/whl/cpu
+                   ```
+                
+                3. Check the logs for detailed error information.
+                """)
+                
+                # Set a dummy object to prevent crashes in UI
+                st.session_state.vector_store = None
+                st.stop()
     
     if st.session_state.agent_controller is None:
         with st.spinner("Initializing AI agents..."):
             if not api_key:
                 st.error("⚠️ API key not found! Please check your .env file.")
                 st.stop()
-            st.session_state.agent_controller = AgentController(st.session_state.vector_store)
+            try:
+                st.session_state.agent_controller = AgentController(st.session_state.vector_store)
+            except Exception as e:
+                logger.exception("AgentController init failed: %s", e)
+                st.error(f"⚠️ Failed to initialize AI agents: {e}")
+                st.stop()
 
 def process_documents():
     """Process all documents using Reader Agent"""
@@ -1168,31 +1208,113 @@ def show_planner_page():
 def show_chat_page():
     """Chat assistant page"""
     st.markdown("### 💬 Chat Assistant")
+    st.markdown("Ask questions about your study materials and get instant answers with source citations.")
     
+    # Check if documents are processed
     if not st.session_state.documents_processed:
-        st.warning("Please process documents first!")
+        st.warning("⚠️ Please upload and process documents first to use the chat assistant!")
+        return
+    
+    # Check if vector store has content
+    try:
+        count = st.session_state.vector_store.get_collection_count()
+        if count == 0:
+            st.warning("⚠️ No documents indexed yet. Please process your documents first!")
+            return
+    except:
+        st.warning("⚠️ Vector store not initialized. Please process documents first!")
         return
     
     # Show latest document info
-    if st.session_state.latest_document:
-        st.info(f"📄 Prioritizing: **{st.session_state.latest_document}** (most recently uploaded)")
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        if st.session_state.latest_document:
+            st.info(f"📄 **Prioritizing:** {st.session_state.latest_document} (most recently uploaded)")
+    with col2:
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.chat_history = []
+            st.rerun()
     
-    # Chat history
-    for i, (question, answer) in enumerate(st.session_state.chat_history):
-        st.markdown(f"**Q:** {question}")
-        st.markdown(f"**A:** {answer}")
-        st.divider()
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    # Question input
-    question = st.text_input("Ask a question about your study materials:")
-    if st.button("🔍 Ask", type="primary"):
-        if question:
-            with st.spinner("Thinking..."):
-                # Use latest document for prioritization
-                latest_doc = st.session_state.latest_document if st.session_state.latest_document else None
-                result = st.session_state.agent_controller.answer_question(question, prioritize_source=latest_doc)
-                st.session_state.chat_history.append((question, result['answer']))
-                st.rerun()
+    # Chat history with better formatting
+    if st.session_state.chat_history:
+        for i, chat_item in enumerate(st.session_state.chat_history):
+            # Chat item can be tuple (question, answer) or dict with more info
+            if isinstance(chat_item, tuple):
+                question, answer = chat_item
+                sources = []
+            else:
+                question = chat_item.get('question', '')
+                answer = chat_item.get('answer', '')
+                sources = chat_item.get('sources', [])
+            
+            # User question bubble
+            st.markdown(f"""
+            <div class="chat-message user-message">
+                <div class="chat-bubble user-bubble">
+                    <strong>You:</strong><br>{question}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Assistant answer bubble
+            st.markdown(f"""
+            <div class="chat-message assistant-message">
+                <div class="chat-bubble assistant-bubble">
+                    <strong>Assistant:</strong><br>{answer}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Show sources if available
+            if sources:
+                with st.expander(f"📚 Sources ({len(sources)})", expanded=False):
+                    for source in sources:
+                        st.markdown(f"• {source}")
+            
+            if i < len(st.session_state.chat_history) - 1:
+                st.markdown("<hr style='margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;'>", unsafe_allow_html=True)
+    else:
+        st.info("👋 Start a conversation! Ask a question about your study materials below.")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Question input with better UI
+    question = st.text_input(
+        "💭 Ask a question about your study materials:",
+        placeholder="e.g., What is machine learning? Explain the concept of recursion...",
+        key="chat_input"
+    )
+    
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        ask_button = st.button("🔍 Ask", type="primary", use_container_width=True)
+    
+    if ask_button or (question and question.strip()):
+        if question and question.strip():
+            with st.spinner("🤔 Thinking... Searching through your study materials..."):
+                try:
+                    # Use latest document for prioritization
+                    latest_doc = st.session_state.latest_document if st.session_state.latest_document else None
+                    result = st.session_state.agent_controller.answer_question(
+                        question.strip(), 
+                        prioritize_source=latest_doc
+                    )
+                    
+                    # Store with sources for better display
+                    chat_item = {
+                        'question': question.strip(),
+                        'answer': result.get('answer', 'No answer generated.'),
+                        'sources': result.get('sources', [])
+                    }
+                    st.session_state.chat_history.append(chat_item)
+                    st.success("✅ Answer generated!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Error: {str(e)}. Please check your API key and try again.")
+        else:
+            st.warning("Please enter a question!")
 
 def show_analytics_page():
     """Analytics and progress tracking"""
