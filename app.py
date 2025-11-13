@@ -188,15 +188,6 @@ def process_documents():
             # Store processing results for display
             st.session_state.processing_results = result
             
-            # Celebration message
-            st.markdown("""
-            <div style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        border-radius: 15px; margin: 1rem 0;">
-                <h3 style="color: white; margin: 0;">🎉 Indexing Complete! 🎉</h3>
-                <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0;">✨ Your documents are ready for study!</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
             return True
         else:
             st.error("No content could be extracted from documents.")
