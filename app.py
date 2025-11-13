@@ -575,7 +575,7 @@ def show_home_page():
                 # Then process
                 if process_documents():
                     st.session_state.uploaded_files_shared = None  # Clear after processing
-                    st.balloons()
+                    # Balloons already shown in process_documents()
                     st.rerun()
     
     # Show existing documents
