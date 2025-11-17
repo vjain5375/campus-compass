@@ -1,90 +1,116 @@
-# AI Study Assistant - Multi-Agent System
+# AI Study Assistant · Multi-Agent Copilot
 
-A personalized study assistant with flashcards, quizzes, and revision planning powered by AI.
+[![Streamlit](https://img.shields.io/badge/Streamlit-%23FF4B4B.svg?style=flat&logo=Streamlit&logoColor=white)](https://streamlit.io/) [![LangChain](https://img.shields.io/badge/LangChain-1E4169?style=flat&logo=chainlink&logoColor=white)](https://www.langchain.com/) [![ChromaDB](https://img.shields.io/badge/ChromaDB-181818?style=flat&logo=amazondynamodb&logoColor=white)](https://www.trychroma.com/)
 
-## 🌐 Live Application
+> Hack Infinity finalist that turns unstructured study material into flashcards, quizzes, revision plans, and chat responses—all orchestrated by resilient AI agents.
 
-**👉 [Access the Application](https://the-bug-slayers-hack-infinity-final.streamlit.app/)**
+**🌐 Live demo:** [the-bug-slayers-hack-infinity-final.streamlit.app](https://the-bug-slayers-hack-infinity-final.streamlit.app/)  
+**🧠 Pitch deck / video:** _coming soon_ · grab the [assets folder](documents/) to see sample PDFs we use during judging.
 
-## Features
+---
 
-- 📚 **Document Processing**: Upload and process PDF, DOCX, and TXT files
-- 🎯 **Flashcard Generation**: Automatically generate Q/A flashcards from study materials
-- 📝 **Quiz Generation**: Create adaptive quizzes to test your knowledge
-- 📅 **Revision Planner**: Get personalized revision schedules
-- 💬 **Chat Assistant**: Ask questions about your study materials with RAG-based answers
-- 🔍 **Semantic Search**: Find relevant information using vector embeddings
+## 🔍 Why This Matters
+- Students lose time rewriting notes—this copilot ingests PDFs and produces study artefacts in minutes.
+- Multi-agent coordination (Reader → Flashcards → Quiz → Planner → Chat) keeps context in sync without hallucinations.
+- A vector store watchdog clears stale chunks per session so judges can’t break the demo with repeated uploads.
 
-## Technology Stack
+---
 
-- **Frontend**: Streamlit
-- **AI/ML**: 
-  - Google Gemini 2.0 Flash (LLM)
-  - Sentence Transformers (Embeddings)
-  - LangChain (LLM Framework)
-- **Vector Database**: ChromaDB
-- **Backend**: Python
+## ✨ Feature Highlights
+- **Document Intelligence**
+  - PDF/DOCX/TXT ingestion with chunk level metrics and topic extraction
+  - On-the-fly API key discovery (Streamlit Secrets → env vars → `.env`)
+- **Autonomous Agents**
+  - `ReaderAgent` cleans + chunks content and logs chunk counts
+  - `FlashcardAgent`, `QuizAgent`, `PlannerAgent`, and `ChatAgent` share the same memory namespace through `AgentController`
+- **Learning Workflow**
+  - Flashcard carousel with spaced-repetition tags
+  - Adaptive quizzes that store answer history
+  - Revision planner that prioritizes weak topics and adds daily streak targets
+  - Chat assistant with RAG + semantic reranking to quote original pages
+- **Resilience**
+  - Embedding backend falls back between local `SentenceTransformer` and Gemini/OpenAI APIs (`EMBEDDING_BACKEND=auto`)
+  - Vector store gets wiped per session to avoid stale embeddings
+  - Graceful error blocks with actionable fixes (Torch install, API keys, etc.)
 
-## Installation
+---
 
-1. Clone the repository:
-```bash
-git clone https://github.com/vjain5375/the-bug-slayers-final.git
-cd the-bug-slayers-final
+## 🧱 Architecture at a Glance
 ```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
+┌─────────────┐       ┌─────────────┐     ┌────────────────┐     ┌──────────────┐
+│ Streamlit UI├──────▶│AgentController├───▶│VectorStore/LLMs├────▶│ChromaDB store│
+└─────▲───────┘       └──────┬──────┘     └────────┬───────┘     └──────▲───────┘
+      │ Documents            │ Agents: Reader, Flashcard, Quiz, Planner, Chat │
+      └──────────────────────┴─────────────────────────────────────────────────┘
 ```
+- UI events dispatch intents to the controller.
+- Controller requests embeddings via `vector_store.py` (local ST or API).
+- LangChain pipelines (Gemini Flash 2.0) create flashcards/quizzes/plans.
+- ChromaDB holds semantic chunks; controller clears/refreshes per upload.
 
-3. Set up environment variables:
-Create a `.env` file with your API key:
-```
-GOOGLE_API_KEY=your_api_key_here
-```
+---
 
-4. Run the application:
+## 🧑‍💻 Agents & Modules
+- `agents/reader_agent.py` – PDF parsing, chunking, topic extraction
+- `agents/flashcard_agent.py` – generates QA pairs + difficulty tagging
+- `agents/quiz_agent.py` – adaptive MCQs with answer tracking
+- `agents/planner_agent.py` – multi-day revision plans using workload heuristics
+- `agents/chat_agent.py` – RAG chat grounded in the latest vector store
+- `vector_store.py` – local/API embedding backend, cache, and cleanup helpers
+- `alerts_manager.py` – surfaces Streamlit toasts from deep calls
+
+---
+
+## ⚙️ Getting Started
+1. **Clone & install**
+   ```bash
+   git clone https://github.com/vjain5375/the-bug-slayers-final.git
+   cd the-bug-slayers-final
+   python -m venv .venv && .\.venv\Scripts\activate  # or source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. **Configure keys (`.env`)**
+   ```
+   GOOGLE_API_KEY=your_gemini_key
+   # optional fallbacks
+   OPENAI_API_KEY=sk-...
+   EMBEDDING_BACKEND=auto   # local | api | auto
+   ```
+3. **(Optional) force API embeddings**
+   ```
+   EMBEDDING_BACKEND=api
+   ```
+
+---
+
+## 🏃 Run Locally
 ```bash
 streamlit run app.py
 ```
 
-## Embedding Backend Configuration
+### CLI flags you might need
+- `STREAMLIT_SERVER_ADDRESS=0.0.0.0` for LAN demos
+- `EMBEDDING_BACKEND=local` to keep everything offline (installs `torch` CPU wheel)
 
-The application supports both local and API-based embeddings:
+---
 
-- **Local (Default)**: Uses SentenceTransformers on CPU
-- **API Fallback**: Automatically falls back to OpenAI/Gemini embeddings if local model fails
+## 🧩 Troubleshooting Cheatsheet
+| Symptom | Fix |
+| --- | --- |
+| “Vector store failed to initialize” | Install Torch CPU `pip install torch --index-url https://download.pytorch.org/whl/cpu` or switch to `EMBEDDING_BACKEND=api`. |
+| Streamlit spinner never shows progress | Spinners are intentionally disabled for accessibility; watch the static status banners at the top. |
+| Nothing happens after uploading | Check `documents/` directory permissions; the app cleans older files on session reset. |
 
-To force API embeddings, set:
-```bash
-EMBEDDING_BACKEND=api
-OPENAI_API_KEY=your_openai_key
-```
+---
 
-## Project Structure
+## 📌 Roadmap
+- [ ] Export flashcards/quizzes as Anki decks & CSV.
+- [ ] Shared study rooms with invite links.
+- [ ] Automated grading for custom answers.
+- [ ] Voice interface for mobile learners.
 
-```
-.
-├── app.py                 # Main Streamlit application
-├── vector_store.py        # Vector database and embeddings management
-├── agents/               # AI agent modules
-│   ├── reader_agent.py   # Document reading and processing
-│   ├── flashcard_agent.py # Flashcard generation
-│   ├── quiz_agent.py     # Quiz generation
-│   ├── planner_agent.py  # Revision planning
-│   ├── chat_agent.py     # RAG-based Q&A
-│   └── controller.py     # Central agent orchestrator
-├── utils/                # Utility modules
-│   └── embeddings_api.py # API-based embeddings wrapper
-└── requirements.txt      # Python dependencies
-```
+---
 
-## License
-
-This project is part of Hack Infinity 2025.
-
-## Contributors
-
-The Bug Slayers Team
+## 🤝 Contributors
+Built by **The Bug Slayers** for Hack Infinity 2025. Reach out via issues or discussions if you’d like to collaborate!
 
